@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "812726611180",
+    "project_id": "intoactive-33958",
+    "storage_bucket": "intoactive-33958.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:812726611180:android:487e8d82129046699749c9",
+        "android_client_info": {
+          "package_name": "com.intoactive.messenger"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "812726611180-u49uomvcpm846qlk6gp0e7tkgifn0nvr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCm2gdJYYa_Rl1qOLtN-xFRG00ifyIP7ho"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "812726611180-u49uomvcpm846qlk6gp0e7tkgifn0nvr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "812726611180-49mmv0408a9kohs38vb80h7j5tjlnt2o.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.intoactive.messenger"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

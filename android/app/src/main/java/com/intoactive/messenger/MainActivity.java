@@ -1,4 +1,4 @@
-package com.messenger;
+package com.intoactive.messenger;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;

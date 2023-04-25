@@ -1,4 +1,4 @@
-package com.messenger;
+package com.intoactive.messenger;
 
 import android.app.Application;
 import com.facebook.react.PackageList;

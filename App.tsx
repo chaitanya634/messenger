@@ -1,28 +1,21 @@
 import React from 'react';
-import {
-  View,
-  Button,
-} from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { HomeScreen } from './src/screens/home';
+import { LoginScreen } from './src/screens/login';
+import { ChatScreen } from './src/screens/chat';
 
-import { 
-  addUserInUsers, 
-  addChatInChatsOfUser, 
-  addMsgInSentMsgs, 
-} from './src/firestore_functions';
+const Stack = createNativeStackNavigator();
 
 function App(): JSX.Element {
   return (
-    <View style={{
-      flex:1,
-      justifyContent:'center',
-      alignItems:'center',
-    }}>
-      <Button title='Hit' onPress={()=>{
-        addUserInUsers(1,"Chaitanya Jadhav","chaitanya@wdimails.com")
-        addChatInChatsOfUser(1,2,'Nikhil Kadam','nikhil.kadam@wdimails.com')
-        addMsgInSentMsgs(1,2,1,"Heyyy")
-      }}/>
-    </View>
+    <NavigationContainer>
+    <Stack.Navigator initialRouteName="Login">
+      <Stack.Screen name="Login" component={LoginScreen} options={{title: "Messenger App"}}/>
+      <Stack.Screen name="Home" component={HomeScreen} options={{headerShown: false}} />
+      <Stack.Screen name="Chat" component={ChatScreen} />
+    </Stack.Navigator>
+  </NavigationContainer>
   );
 }
 

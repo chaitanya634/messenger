@@ -1,24 +1,27 @@
 import React from 'react';
 import {
-  Text,
   View,
+  Button,
 } from 'react-native';
-import firestore from '@react-native-firebase/firestore';
 
+import { 
+  addUserInUsers, 
+  addChatInChatsOfUser, 
+  addMsgInSentMsgs, 
+} from './src/firestore_functions';
 
 function App(): JSX.Element {
-  firestore().collection('Users').get().then((val)=>{
-    console.log('====================================');
-    console.log(val.docs);
-    console.log('====================================');
-  })
   return (
     <View style={{
       flex:1,
       justifyContent:'center',
       alignItems:'center',
     }}>
-      <Text>Hello</Text>
+      <Button title='Hit' onPress={()=>{
+        addUserInUsers(1,"Chaitanya Jadhav","chaitanya@wdimails.com")
+        addChatInChatsOfUser(1,2,'Nikhil Kadam','nikhil.kadam@wdimails.com')
+        addMsgInSentMsgs(1,2,1,"Heyyy")
+      }}/>
     </View>
   );
 }

@@ -29,12 +29,13 @@ export function LoginScreen(){
           })
           if(isAuth){
             navigation.navigate('Home')
+            setEmail("")
           } 
           else {
             Snackbar.show({
             text:"You are not registered",
             duration:Snackbar.LENGTH_SHORT
-          })
+            })
           }
         })
           

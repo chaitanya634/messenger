@@ -24,11 +24,16 @@ export function sendMsg(userId: number, userName:string, userEmail:string, chatU
 
     users.doc(userId.toString()).collection('chats')
   .doc(chatUserId.toString()).collection('sent_messages')
-  .doc(msgOrderId.toString()).set({
-    content: msgContent,
-    date_time: firestore.FieldValue.serverTimestamp(),
-    order_id: msgOrderId
-  });
+  .add({
+        content: msgContent,
+        date_time: firestore.FieldValue.serverTimestamp(),
+        // order_id: msgOrderId
+  })
+  // .doc(msgOrderId.toString()).set({
+  //   content: msgContent,
+  //   date_time: firestore.FieldValue.serverTimestamp(),
+  //   order_id: msgOrderId
+  // });
 
   //add to receiver
   addChatInChatsOfUser(chatUserId,userId,userName, userEmail)
@@ -37,6 +42,6 @@ export function sendMsg(userId: number, userName:string, userEmail:string, chatU
   .doc(msgOrderId.toString()).set({
     content: msgContent,
     date_time: firestore.FieldValue.serverTimestamp(),
-    order_id: msgOrderId
+    // order_id: msgOrderId
   });
 }

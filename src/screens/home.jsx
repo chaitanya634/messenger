@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigation, useRoute } from "@react-navigation/native"
-import { View, Text, SafeAreaView, Button, ActivityIndicator, FlatList } from "react-native"
+import { View, Text, SafeAreaView, Button, ActivityIndicator, FlatList, TouchableOpacity } from "react-native"
 import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 
 function Users(props) {
     const [loading, setLoading] = useState(true); 
     const [users, setUsers] = useState([]);
+
+    const navigation = useNavigation()
     
     useEffect(() => {
         const subscriber = firestore()
@@ -28,12 +30,25 @@ function Users(props) {
     return (
         <FlatList
           data={users}
-          renderItem={({ item }) => (
-            <View style={{ height: 50, flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-              <Text>{item.name} </Text>
-              <Text>User Name</Text>
-            </View>
-          )}
+          renderItem={({ item }) => {
+            return (
+              <View style={{ height: 52 , justifyContent: 'center', borderBottomWidth: 1 }}>
+                <TouchableOpacity onPress={()=>{
+                  navigation.navigate('Chat', {
+                    userId: props.userId,
+                    userName:props.userName,
+                    userEmail:props.userEmail,
+                    chatUserId: item.id,
+                    chatUserName: item.name,
+                    chatUserEmail: item.email
+                  })
+                }}>
+                  <Text style={{fontWeight: "500", fontSize:16}}>{item.name} </Text>
+                  <Text style={{fontSize: 12}}>{item.email}</Text>
+                </TouchableOpacity>
+              </View>
+            )
+          }}
         />
       );
 }
@@ -62,7 +77,7 @@ export function HomeScreen(){
             
             {/* chats list */}
             <View style={{flex:1, justifyContent:"center"}}>
-                <Users userId={route.params.user_id}/>
+                <Users userId={route.params.user_id} userName={route.params.user_name} userEmail={route.params.user_email}/>
             </View>
             </View>
         </SafeAreaView>

@@ -3,7 +3,6 @@ import { useState } from "react";
 import { View, Button, TextInput, SafeAreaView} from "react-native";
 import Snackbar from "react-native-snackbar";
 import firestore from '@react-native-firebase/firestore';
-import { addChatInChatsOfUser, addMsgInSentMsgs, addUserInUsers } from "../firestore_functions";
 
 export function LoginScreen(){
     const navigation = useNavigation()

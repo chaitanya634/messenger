@@ -18,9 +18,22 @@ export function addChatInChatsOfUser(userId:number, chatUserId: number, chatUser
   })
 }
 
-export function addMsgInSentMsgs(userId: number, chatUserId: number, msgOrderId: number, msgContent: string){
+export function sendMsg(userId: number, userName:string, userEmail:string, chatUserId: number, chatUserName:string, chatUserEmail:string, msgOrderId: number, msgContent: string){
+  //sender
+  addChatInChatsOfUser(userId,chatUserId,chatUserName,chatUserEmail)
+
     users.doc(userId.toString()).collection('chats')
   .doc(chatUserId.toString()).collection('sent_messages')
+  .doc(msgOrderId.toString()).set({
+    content: msgContent,
+    date_time: firestore.FieldValue.serverTimestamp(),
+    order_id: msgOrderId
+  });
+
+  //add to receiver
+  addChatInChatsOfUser(chatUserId,userId,userName, userEmail)
+  users.doc(chatUserId.toString()).collection('chats')
+  .doc(userId.toString()).collection('received_messages')
   .doc(msgOrderId.toString()).set({
     content: msgContent,
     date_time: firestore.FieldValue.serverTimestamp(),

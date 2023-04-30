@@ -9,33 +9,32 @@ function Users(props) {
 
     const navigation = useNavigation()
     
-    useEffect(() => {
-        const subscriber = firestore()
-          .collection('users')
-          .onSnapshot(querySnapshot => {
-            const users = [];
-            querySnapshot.docs.forEach((doc)=>{
-              if(doc.data().id != props.userId) {
-                users.push(doc.data())
-              }
-            })
-            setUsers(users);
-            setLoading(false);
-          });
-        return () => subscriber();
-      }, []);
-    if (loading) {
-      return <ActivityIndicator />;
-    }
+    // useEffect(() => {
+    //     const subscriber = firestore()
+    //       .collection('users')
+    //       .onSnapshot(querySnapshot => {
+    //         const users = [];
+    //         querySnapshot.docs.forEach((doc)=>{
+    //           if(doc.data().id != props.userId) {
+    //             users.push(doc.data())
+    //           }
+    //         })
+    //         setUsers(users);
+    //         setLoading(false);
+    //       });
+    //     return () => subscriber();
+    //   }, []);
+    // if (loading) {
+    //   return <ActivityIndicator />;
+    // }
     return (
         <FlatList
-          data={users}
+          data={[]}
           renderItem={({ item }) => {
             return (
               <View style={{ height: 52 , justifyContent: 'center', borderBottomWidth: 1 }}>
                 <TouchableOpacity onPress={()=>{
                   navigation.navigate('Chat', {
-                    userId: props.userId,
                     userName:props.userName,
                     userEmail:props.userEmail,
                     chatUserId: item.id,

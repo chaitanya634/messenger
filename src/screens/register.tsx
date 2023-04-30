@@ -32,7 +32,7 @@ export const RegisterScreen = () => {
         defaultValue={name}
       />
       <TextInput
-        style={ComponentStyles.textInput}
+        style={{...ComponentStyles.textInput, marginBottom: 22}}
         placeholder="Please enter your email"
         onChangeText={(input) => setEmail(input)}
         defaultValue={email}

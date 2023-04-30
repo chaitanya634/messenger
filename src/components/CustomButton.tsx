@@ -38,7 +38,7 @@ const CustomButton = (props: Props) => (
 
 
 const defaultEnableStyle: StyleProp<TextStyle> = {
-    marginTop: 22,
+    // marginTop: 22,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 12,

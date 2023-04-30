@@ -19,7 +19,7 @@ export function LoginScreen() {
   return (
     <SafeAreaView>
       <TextInput
-        style={ComponentStyles.textInput}
+        style={{...ComponentStyles.textInput, marginBottom: 22}}
         placeholder="Please enter your email"
         onChangeText={(input) => setEmail(input)}
         defaultValue={email}
@@ -77,7 +77,7 @@ export function LoginScreen() {
           fontWeight: "bold",
           fontSize: 18,
           alignSelf: "center",
-          marginTop: 22
+          margin: 22
         }}>
         -   -   -   -   OR   -   -   -   -
       </Text>

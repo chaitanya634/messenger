@@ -40,21 +40,25 @@ export function LoginScreen() {
               const docs = res.docs
               let dbUserName = null
               let dbUserEmail = null
+              let userDocId = null
               for (const doc of docs) {
                 if (doc.data().userEmail == email) {
                   isAuth = true
                   dbUserName = doc.data().userName
                   dbUserEmail = doc.data().userEmail
+                  userDocId = doc.id
                   break;
                 } else {
                   isAuth = false
                 }
               }
-              if (isAuth && dbUserName != null && dbUserEmail != null) {
+              if (isAuth) {
                 navigation.navigate("Home",{
+                  userId: userDocId,
                   userName: dbUserName,
-                  userEmail: dbUserEmail
+                  userEmail: dbUserEmail,
                 })
+                setEmail("")
               } else {
                 Alert.alert(
                   "Cannot Login", 

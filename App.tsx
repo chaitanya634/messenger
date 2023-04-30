@@ -13,6 +13,14 @@ export type StackParams = {
   Chat: any
 }
 
+export type ScreenParams = {
+  Home: {
+    userId: string,
+    userName: string,
+    userEmail: string
+  }
+}
+
 const Stack = createNativeStackNavigator<StackParams>();
 
 function App(): JSX.Element {

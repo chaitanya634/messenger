@@ -1,19 +1,24 @@
 import React, { useEffect, useState } from 'react'
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
-import { View, Text, SafeAreaView, Button, ActivityIndicator, FlatList, TouchableOpacity } from "react-native"
+import { View, Text, SafeAreaView, ActivityIndicator, FlatList, TouchableOpacity } from "react-native"
 import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
-import { ScreenParams } from '../../App';
+import { ScreenParams, StackParams } from '../../App';
 import CustomButton from '../components/CustomButton';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import CustomHeader from '../components/header';
 
 
 type ListItemType = {
-    userName: string,
-    userEmail: string
+    chatUserId: string,
+    chatUserName: string,
+    chatUserEmail: string
 }
 
 function Users(props: any) {
     const [loading, setLoading] = useState(true);
     const [users, setUsers] = useState([]);
+
+    const navigation = useNavigation<NativeStackNavigationProp<StackParams>>();
 
     useEffect(() => {
         const subscriber = firestore()
@@ -22,7 +27,12 @@ function Users(props: any) {
                 const users: any = [];
                 querySnapshot.docs.forEach((doc) => {
                     if (doc.id != props.userId) {
-                        users.push(doc.data())
+                        users.push({
+                            userId: props.userId,
+                            chatUserId: doc.id,
+                            chatUserName: doc.data().userName,
+                            chatUserEmail: doc.data().userEmail
+                        })
                     }
                 })
                 setUsers(users);
@@ -37,7 +47,7 @@ function Users(props: any) {
     return (
         <FlatList
             data={users}
-            keyExtractor={(item: ListItemType) => item.userEmail}
+            keyExtractor={(item: ListItemType) => item.chatUserEmail}
             renderItem={({ item }) => (
                 <View style={{
                     paddingVertical: 6,
@@ -45,9 +55,14 @@ function Users(props: any) {
                     justifyContent: 'center',
                     borderBottomWidth: 1
                 }}>
-                    <TouchableOpacity>
-                        <Text style={{ fontSize: 18, color: "#611313"}} >{item.userName}</Text>
-                        <Text style={{color: "#611313"}} >{item.userEmail}</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('Chat',{
+                        userId: props.userId,
+                        chatUserId: item.chatUserId,
+                        chatUserName: item.chatUserName,
+                        chatUserEmail: item.chatUserEmail
+                    })} >
+                        <Text style={{ fontSize: 18, color: "#611313" }} >{item.chatUserName}</Text>
+                        <Text style={{ color: "#611313" }} >{item.chatUserEmail}</Text>
                     </TouchableOpacity>
                 </View>
             )}
@@ -64,25 +79,11 @@ export function HomeScreen() {
         <SafeAreaView style={{ flex: 1 }}>
             <View style={{ margin: 12, flex: 1 }}>
                 {/* header */}
-                <View style={{ flexDirection: "row" }}>
-                    <View style={{ flex: 1 }}>
-                        <Text style={{
-                            fontSize: 28,
-                            fontWeight: "400",
-                            color: "#940000"
-                        }}>{route.params?.userName}</Text>
-                        <Text style={{
-                            fontSize: 16,
-                            color: "#940000"
-                        }}>{route.params.userEmail}</Text>
-                    </View>
-                    <View style={{ justifyContent: "center", marginRight: 6 }}>
-                        <CustomButton
-                            text='Logout'
-                            onTap={() => navigation.goBack()}
-                        />
-                    </View>
-                </View>
+                <CustomHeader 
+                    title={route.params.userName}
+                    subtitle={route.params.userEmail}
+                    action={{text:"Logout",onPress: () => navigation.goBack()}}
+                />
 
                 {/* body */}
                 <Text style={{ marginTop: 12, marginBottom: 8, fontSize: 18, fontWeight: "bold" }}>My Chats</Text>
@@ -91,8 +92,8 @@ export function HomeScreen() {
                 <View style={{ flex: 1, justifyContent: "center" }}>
                     <Users
                         userId={route.params.userId}
-                        // userName={route.params.userName}
-                        // userEmail={route.params.userEmail}
+                    // userName={route.params.userName}
+                    // userEmail={route.params.userEmail}
                     />
                 </View>
             </View>

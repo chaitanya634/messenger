@@ -18,6 +18,12 @@ export type ScreenParams = {
     userId: string,
     userName: string,
     userEmail: string
+  },
+  Chat: {
+    userId: string,
+    chatUserId: string,
+    chatUserName: string,
+    chatUserEmail: string
   }
 }
 
@@ -26,13 +32,13 @@ const Stack = createNativeStackNavigator<StackParams>();
 function App(): JSX.Element {
   return (
     <NavigationContainer>
-    <Stack.Navigator initialRouteName="Login">
-      <Stack.Screen name="Login" component={LoginScreen} options={{title: "Messenger App"}}/>
-      <Stack.Screen name="Register" component={RegisterScreen} options={{title: "Register"}}/>
-      <Stack.Screen name="Home" component={HomeScreen} options={{headerShown: false}} />
-      <Stack.Screen name="Chat" component={ChatScreen} options={{headerShown: false}} />
-    </Stack.Navigator>
-  </NavigationContainer>
+      <Stack.Navigator initialRouteName="Login">
+        <Stack.Screen name="Login" component={LoginScreen} options={{ title: "Messenger App" }} />
+        <Stack.Screen name="Register" component={RegisterScreen} options={{ title: "Register" }} />
+        <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Chat" component={ChatScreen} options={{ headerShown: false }} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 

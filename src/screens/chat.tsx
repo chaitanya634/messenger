@@ -9,6 +9,43 @@ import ComponentStyles from "../styles";
 import firestore, { FirebaseFirestoreTypes, firebase } from '@react-native-firebase/firestore';
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
+function QuickSort(
+    arr: any,
+    start: number = 0,
+    end: number = arr.length
+): any {
+    if (start < end) {
+        let p = partition(arr, start, end);
+        QuickSort(arr, start, p - 1);
+        QuickSort(arr, p + 1, end);
+    }
+    return arr;
+}
+
+function partition(
+    arr: any,
+    start: number = 0,
+    end: number = arr.length
+) {
+    let pivot: number = arr[start].dateTime.seconds
+    let swapIndex: number = start;
+    for (let i = start + 1; i < end; i++) {
+        if (arr[i].dateTime.seconds < pivot) {
+            swapIndex++;
+            swap(arr, i, swapIndex);
+        }
+    }
+    swap(arr, start, swapIndex);
+    return swapIndex;
+}
+
+function swap(arr: any, i: number, j: number) {
+    let temp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = temp;
+}
+
+
 enum MsgType { sent, received }
 
 type ListItemType = {
@@ -68,7 +105,7 @@ export function ChatScreen() {
                                 messages.push({
                                     content: doc.data().content,
                                     dateTime: doc.data().dateTime,
-                                    msgType: MsgType.sent
+                                    msgType: MsgType.sent,
                                 })
                             })
                             //add recv msgs
@@ -83,10 +120,12 @@ export function ChatScreen() {
                                         messages.push({
                                             content: doc.data().content,
                                             dateTime: doc.data().dateTime,
-                                            msgType: MsgType.received
+                                            msgType: MsgType.received,
                                         })
                                     })
-                                    setMessages(messages)
+                                    // messages[0].dateTime.toMillis()
+                                    
+                                    setMessages(QuickSort(messages).reverse())
                                     setLoading(false)
                                 })
                         });
@@ -94,7 +133,6 @@ export function ChatScreen() {
                 }
             })
     }, [refreshCount]);
-
 
     return (
         <SafeAreaView style={{ flex: 1, margin: 12 }}>
@@ -121,6 +159,7 @@ export function ChatScreen() {
                                 (item: ListItemType) => Date.now().toString(36) + Math.random().toString(36).substring(2)
                             }
                             renderItem={({ item }) => {
+                                
                                 if (item.msgType == MsgType.sent) {
                                     return (
                                         <Text style={{

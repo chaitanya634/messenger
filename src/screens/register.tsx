@@ -30,12 +30,14 @@ export const RegisterScreen = () => {
         placeholder="Please enter your name"
         onChangeText={(input) => setName(input)}
         defaultValue={name}
+        placeholderTextColor="#A7A7A7"
       />
       <TextInput
         style={{...ComponentStyles.textInput, marginBottom: 22}}
         placeholder="Please enter your email"
         onChangeText={(input) => setEmail(input)}
         defaultValue={email}
+        placeholderTextColor="#A7A7A7"
       />
       <CustomButton
         text="Submit"

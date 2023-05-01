@@ -11,7 +11,7 @@ type HeaderParams = {
 };
 
 const CustomHeader = (params: HeaderParams) => (
-    <View style={{ flexDirection: "row" }}>
+    <View style={{ flexDirection: "row", borderBottomWidth: 1, paddingBottom: 6 }}>
         <View style={{ flex: 1 }}>
             <Text style={styles.title}>{params.title}</Text>
             <Text style={styles.subtitle}>{params.subtitle}</Text>

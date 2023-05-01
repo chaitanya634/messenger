@@ -12,6 +12,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 type ListItemType = {
     content: string,
+    dateTime: FirebaseFirestoreTypes.Timestamp
 }
 
 type MsgBodyParams = {
@@ -90,10 +91,6 @@ export function ChatScreen() {
                 marginVertical: 12,
                 justifyContent: "center"
             }}>
-                {/* <MessagesBody
-                    userId={route.params.userId}
-                    chatUserId={route.params.chatUserId}
-                /> */}
                 {
                     loading
                         ? <ActivityIndicator />

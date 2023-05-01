@@ -21,6 +21,8 @@ export type ScreenParams = {
   },
   Chat: {
     userId: string,
+    userName: string,
+    userEmail: string,
     chatUserId: string,
     chatUserName: string,
     chatUserEmail: string

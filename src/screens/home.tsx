@@ -28,7 +28,6 @@ function Users(props: any) {
                 querySnapshot.docs.forEach((doc) => {
                     if (doc.id != props.userId) {
                         users.push({
-                            userId: props.userId,
                             chatUserId: doc.id,
                             chatUserName: doc.data().userName,
                             chatUserEmail: doc.data().userEmail
@@ -43,7 +42,7 @@ function Users(props: any) {
     if (loading) {
         return <ActivityIndicator />;
     }
-
+    
     return (
         <FlatList
             data={users}
@@ -57,6 +56,8 @@ function Users(props: any) {
                 }}>
                     <TouchableOpacity onPress={() => navigation.navigate('Chat',{
                         userId: props.userId,
+                        userName: props.userName,
+                        userEmail: props.userEmail,
                         chatUserId: item.chatUserId,
                         chatUserName: item.chatUserName,
                         chatUserEmail: item.chatUserEmail
@@ -92,8 +93,8 @@ export function HomeScreen() {
                 <View style={{ flex: 1, justifyContent: "center" }}>
                     <Users
                         userId={route.params.userId}
-                    // userName={route.params.userName}
-                    // userEmail={route.params.userEmail}
+                        userName={route.params.userName}
+                        userEmail={route.params.userEmail}
                     />
                 </View>
             </View>

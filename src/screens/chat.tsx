@@ -51,6 +51,7 @@ export function ChatScreen() {
                 />
                 <CustomButton
                     text="Send"
+                    isDisabled={isSendBtnDisabled}
                     onTap={() => {
                         if (msg.trim() == "") {
                             Alert.alert(
@@ -62,7 +63,8 @@ export function ChatScreen() {
                         }
                         else {
                             setIsSendBtnDisabled(true)
-                            //add to sent msgs
+
+                            // add/update chat in sent msgs
                             const dbUsers = firestore().collection('users')
                             let chatDocId = ""
                             dbUsers.doc(route.params.userId)
@@ -75,6 +77,7 @@ export function ChatScreen() {
                                         }
                                     }
                                     if (chatDocId == "") {
+                                        //chat didnt exist, so add new
                                         dbUsers.doc(route.params.userId)
                                             .collection('chats').add({
                                                 chatUserEmail: route.params.chatUserEmail,
@@ -85,42 +88,96 @@ export function ChatScreen() {
                                                     content: msg,
                                                     dataTime: firebase.firestore.FieldValue.serverTimestamp()
                                                 }).then((r) => {
-                                                    console.log('====================================');
-                                                    console.log("Added new chat");
-                                                    console.log('====================================');
-                                                })
 
+                                                    //received msgs
+                                                    let recvChatDocId = ""
+                                                    dbUsers.doc(route.params.chatUserId)
+                                                        .collection('chats').get()
+                                                        .then((snapshot) => {
+                                                            for (const doc of snapshot.docs) {
+                                                                if (doc.data().chatUserEmail == route.params.userEmail) {
+                                                                    recvChatDocId = doc.id
+                                                                    break
+                                                                }
+                                                            }
+                                                            if (recvChatDocId == "") {
+                                                                dbUsers.doc(route.params.chatUserId)
+                                                                    .collection('chats').add({
+                                                                        chatUserId: route.params.userId,
+                                                                        chatUserName: route.params.userName,
+                                                                        chatUserEmail: route.params.userEmail
+                                                                    }).then((ss1) => {
+                                                                        ss1.collection('received messages').add({
+                                                                            content: msg,
+                                                                            dataTime: firebase.firestore.FieldValue.serverTimestamp()
+                                                                        }).then((_)=>{
+                                                                            setIsSendBtnDisabled(false)
+                                                                        })
+                                                                        
+                                                                    })
+                                                            } else {
+                                                                dbUsers.doc(route.params.chatUserId)
+                                                                    .collection('chats')
+                                                                    .doc(recvChatDocId).
+                                                                    collection('received messages').add({
+                                                                        content: msg,
+                                                                        dataTime: firebase.firestore.FieldValue.serverTimestamp()
+                                                                    }).then((_)=>{
+                                                                        setIsSendBtnDisabled(false)
+                                                                    })
+                                                            }
+                                                        })
+                                                })
                                             })
                                     } else {
+                                    //chat exist so update it
                                         dbUsers.doc(route.params.userId)
                                             .collection('chats').doc(chatDocId).collection('sent messages').add({
                                                 content: msg,
                                                 dataTime: firebase.firestore.FieldValue.serverTimestamp()
                                             }).then((res) => {
-                                                console.log('====================================');
-                                                console.log("Updated chat");
-                                                console.log('====================================');
+                                                console.log("Updated chat and added new msg");
+
+                                                //add to received msgs
+                                                let recvChatDocId = ""
+                                                dbUsers.doc(route.params.chatUserId)
+                                                    .collection('chats').get()
+                                                    .then((snapshot) => {
+                                                        for (const doc of snapshot.docs) {
+                                                            if (doc.data().chatUserEmail == route.params.userEmail) {
+                                                                recvChatDocId = doc.id
+                                                                break
+                                                            }
+                                                        }
+                                                        if (recvChatDocId == "") {
+                                                            dbUsers.doc(route.params.chatUserId)
+                                                                .collection('chats').add({
+                                                                    chatUserId: route.params.userId,
+                                                                    chatUserName: route.params.userName,
+                                                                    chatUserEmail: route.params.userEmail
+                                                                }).then((ss1) => {
+                                                                    ss1.collection('received messages').add({
+                                                                        content: msg,
+                                                                        dataTime: firebase.firestore.FieldValue.serverTimestamp()
+                                                                    }).then((_)=>{
+                                                                        setIsSendBtnDisabled(false)
+                                                                    })
+                                                                })
+                                                        } else {
+                                                            dbUsers.doc(route.params.chatUserId)
+                                                                .collection('chats')
+                                                                .doc(recvChatDocId).
+                                                                collection('received messages').add({
+                                                                    content: msg,
+                                                                    dataTime: firebase.firestore.FieldValue.serverTimestamp()
+                                                                }).then((_)=>{
+                                                                    setIsSendBtnDisabled(false)
+                                                                })
+                                                        }
+                                                    })
                                             })
                                     }
-
                                 })
-
-
-
-
-                            // .add({
-                            //     chatUserName: route.params.chatUserName,
-                            //     chatUserEmail: route.params.chatUserEmail,
-                            //     chatUserId: route.params.chatUserId
-                            // }).then((chatDoc) => {
-                            //     chatDoc.collection('sent messages')
-                            //         .add({
-                            //             content: msg,
-                            //             dataTime: firebase.firestore.FieldValue.serverTimestamp()
-                            //         }).then((msgDoc) => {
-                            //             //add to received msgs
-                            //         })
-                            // })
                         }
                     }}
                 />

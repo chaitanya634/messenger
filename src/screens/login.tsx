@@ -21,6 +21,7 @@ export function LoginScreen() {
       <TextInput
         style={{...ComponentStyles.textInput, marginBottom: 22}}
         placeholder="Please enter your email"
+        placeholderTextColor="#A7A7A7"
         onChangeText={(input) => setEmail(input)}
         defaultValue={email}
       />
@@ -77,7 +78,8 @@ export function LoginScreen() {
           fontWeight: "bold",
           fontSize: 18,
           alignSelf: "center",
-          margin: 22
+          margin: 22,
+          color: "#A18B8B"
         }}>
         -   -   -   -   OR   -   -   -   -
       </Text>

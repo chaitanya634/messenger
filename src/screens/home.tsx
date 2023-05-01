@@ -87,7 +87,9 @@ export function HomeScreen() {
                 />
 
                 {/* body */}
-                <Text style={{ marginTop: 12, marginBottom: 8, fontSize: 18, fontWeight: "bold" }}>My Chats</Text>
+                <Text style={{ marginTop: 12, marginBottom: 8, 
+                    color:"#7C7C7C",
+                    fontSize: 18, fontWeight: "bold" }}>My Chats</Text>
 
                 {/* chats list */}
                 <View style={{ flex: 1, justifyContent: "center" }}>

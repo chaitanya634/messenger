@@ -117,9 +117,11 @@ export function ChatScreen() {
                         : <FlatList
                             inverted={true}
                             data={messages}
-                            keyExtractor={(item: ListItemType) => item.content}
+                            keyExtractor={
+                                (item: ListItemType) => Date.now().toString(36) + Math.random().toString(36).substring(2)
+                            }
                             renderItem={({ item }) => {
-                                if(item.msgType == MsgType.sent) {
+                                if (item.msgType == MsgType.sent) {
                                     return (
                                         <Text style={{
                                             fontSize: 19,
@@ -150,7 +152,7 @@ export function ChatScreen() {
                                     }} >{item.content}</Text>
                                 )
                             }
-                        }
+                            }
                         />
                 }
 
@@ -166,9 +168,11 @@ export function ChatScreen() {
                         borderRadius: 12,
                         paddingHorizontal: 13,
                         borderColor: "#525252",
+                        color: "#525252",
                         flex: 1
                     }}
                     placeholder="Please enter message"
+                    placeholderTextColor="#A7A7A7"
                     onChangeText={(input) => setMsg(input)}
                     defaultValue={msg}
                 />

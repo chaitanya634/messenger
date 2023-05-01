@@ -1,12 +1,24 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import { View, Text, SafeAreaView, Button, ActivityIndicator, TouchableOpacity, FlatList, TextInput, Alert } from "react-native";
-import { ScreenParams } from "../../App";
+import { ScreenParams, StackParams } from "../../App";
 import { sendMsg } from "../firestore_functions";
 import CustomHeader from "../components/header";
 import CustomButton from "../components/CustomButton";
 import ComponentStyles from "../styles";
 import firestore, { FirebaseFirestoreTypes, firebase } from '@react-native-firebase/firestore';
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+
+type ListItemType = {
+    content: string,
+}
+
+type MsgBodyParams = {
+    userId: string,
+    chatUserId: string
+}
+
 
 export function ChatScreen() {
     const navigation = useNavigation()
@@ -14,6 +26,54 @@ export function ChatScreen() {
 
     const [msg, setMsg] = useState("")
     const [isSendBtnDisabled, setIsSendBtnDisabled] = useState(false)
+
+    //msg
+    const [refreshCount, setRefreshCount] = useState(0)
+    const [loading, setLoading] = useState(true);
+    const [messages, setMessages] = useState([]);
+
+    let chatUserDocId = ""
+
+    useEffect(() => {
+        //search for chat
+        firestore().collection('users')
+            .doc(route.params.userId)
+            .collection('chats')
+            .get().then((res) => {
+                const docs = res.docs
+                for (const doc of docs) {
+                    if (doc.data().chatUserId == route.params.chatUserId) {
+                        chatUserDocId = doc.id
+                        break
+                    }
+                }
+                if (chatUserDocId == "") {
+                    setMessages([])
+                    setLoading(false)
+                }
+                else {
+                    const subscriber = firestore()
+                        .collection('users')
+                        .doc(route.params.userId)
+                        .collection('chats')
+                        .doc(chatUserDocId)
+                        .collection('sent messages')
+                        .onSnapshot(querySnapshot => {
+                            const messages: any = []
+                            querySnapshot.docs.forEach((doc) => {
+                                messages.push({
+                                    content: doc.data().content,
+                                    dateTime: doc.data().dateTime
+                                })
+                            })
+                            setMessages(messages)
+                            setLoading(false)
+                        });
+                    return () => subscriber();
+                }
+            })
+    }, [refreshCount]);
+
 
     return (
         <SafeAreaView style={{ flex: 1, margin: 12 }}>
@@ -30,7 +90,32 @@ export function ChatScreen() {
                 marginVertical: 12,
                 justifyContent: "center"
             }}>
-                <ActivityIndicator />
+                {/* <MessagesBody
+                    userId={route.params.userId}
+                    chatUserId={route.params.chatUserId}
+                /> */}
+                {
+                    loading
+                        ? <ActivityIndicator />
+                        : <FlatList
+                            inverted={true}
+                            data={messages}
+                            keyExtractor={(item: ListItemType) => item.content}
+                            renderItem={({ item }) => (
+                                <Text style={{
+                                    fontSize: 18,
+                                    color: "#000000",
+                                    backgroundColor: "#6FC3FC",
+                                    marginBottom: 6,
+                                    paddingHorizontal: 8,
+                                    paddingVertical: 4,
+                                    alignSelf: "flex-end",
+                                    borderRadius: 6
+                                }} >{item.content}</Text>
+                            )}
+                        />
+                }
+
             </View>
 
             {/* footer */}
@@ -86,7 +171,7 @@ export function ChatScreen() {
                                             }).then((res) => {
                                                 res.collection('sent messages').add({
                                                     content: msg,
-                                                    dataTime: firebase.firestore.FieldValue.serverTimestamp()
+                                                    dateTime: firebase.firestore.FieldValue.serverTimestamp()
                                                 }).then((r) => {
 
                                                     //received msgs
@@ -109,11 +194,13 @@ export function ChatScreen() {
                                                                     }).then((ss1) => {
                                                                         ss1.collection('received messages').add({
                                                                             content: msg,
-                                                                            dataTime: firebase.firestore.FieldValue.serverTimestamp()
-                                                                        }).then((_)=>{
+                                                                            dateTime: firebase.firestore.FieldValue.serverTimestamp()
+                                                                        }).then((_) => {
+                                                                            setMsg("")
                                                                             setIsSendBtnDisabled(false)
+                                                                            setRefreshCount(refreshCount + 1)
                                                                         })
-                                                                        
+
                                                                     })
                                                             } else {
                                                                 dbUsers.doc(route.params.chatUserId)
@@ -121,20 +208,22 @@ export function ChatScreen() {
                                                                     .doc(recvChatDocId).
                                                                     collection('received messages').add({
                                                                         content: msg,
-                                                                        dataTime: firebase.firestore.FieldValue.serverTimestamp()
-                                                                    }).then((_)=>{
+                                                                        dateTime: firebase.firestore.FieldValue.serverTimestamp()
+                                                                    }).then((_) => {
+                                                                        setMsg("")
                                                                         setIsSendBtnDisabled(false)
+                                                                        setRefreshCount(refreshCount + 1)
                                                                     })
                                                             }
                                                         })
                                                 })
                                             })
                                     } else {
-                                    //chat exist so update it
+                                        //chat exist so update it
                                         dbUsers.doc(route.params.userId)
                                             .collection('chats').doc(chatDocId).collection('sent messages').add({
                                                 content: msg,
-                                                dataTime: firebase.firestore.FieldValue.serverTimestamp()
+                                                dateTime: firebase.firestore.FieldValue.serverTimestamp()
                                             }).then((res) => {
                                                 console.log("Updated chat and added new msg");
 
@@ -158,8 +247,9 @@ export function ChatScreen() {
                                                                 }).then((ss1) => {
                                                                     ss1.collection('received messages').add({
                                                                         content: msg,
-                                                                        dataTime: firebase.firestore.FieldValue.serverTimestamp()
-                                                                    }).then((_)=>{
+                                                                        dateTime: firebase.firestore.FieldValue.serverTimestamp()
+                                                                    }).then((_) => {
+                                                                        setMsg("")
                                                                         setIsSendBtnDisabled(false)
                                                                     })
                                                                 })
@@ -169,8 +259,9 @@ export function ChatScreen() {
                                                                 .doc(recvChatDocId).
                                                                 collection('received messages').add({
                                                                     content: msg,
-                                                                    dataTime: firebase.firestore.FieldValue.serverTimestamp()
-                                                                }).then((_)=>{
+                                                                    dateTime: firebase.firestore.FieldValue.serverTimestamp()
+                                                                }).then((_) => {
+                                                                    setMsg("")
                                                                     setIsSendBtnDisabled(false)
                                                                 })
                                                         }

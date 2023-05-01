@@ -27,10 +27,10 @@ function partition(
     start: number = 0,
     end: number = arr.length
 ) {
-    let pivot: number = arr[start].dateTime.seconds
+    let pivot: number = arr[start].dateTime.toMillis()
     let swapIndex: number = start;
     for (let i = start + 1; i < end; i++) {
-        if (arr[i].dateTime.seconds < pivot) {
+        if (arr[i].dateTime.toMillis() < pivot) {
             swapIndex++;
             swap(arr, i, swapIndex);
         }

@@ -9,10 +9,12 @@ import ComponentStyles from "../styles";
 import firestore, { FirebaseFirestoreTypes, firebase } from '@react-native-firebase/firestore';
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
+enum MsgType { sent, received }
 
 type ListItemType = {
     content: string,
-    dateTime: FirebaseFirestoreTypes.Timestamp
+    dateTime: FirebaseFirestoreTypes.Timestamp,
+    msgType: MsgType
 }
 
 type MsgBodyParams = {
@@ -53,7 +55,8 @@ export function ChatScreen() {
                     setLoading(false)
                 }
                 else {
-                    const subscriber = firestore()
+                    //listen to sent msgs
+                    firestore()
                         .collection('users')
                         .doc(route.params.userId)
                         .collection('chats')
@@ -64,13 +67,30 @@ export function ChatScreen() {
                             querySnapshot.docs.forEach((doc) => {
                                 messages.push({
                                     content: doc.data().content,
-                                    dateTime: doc.data().dateTime
+                                    dateTime: doc.data().dateTime,
+                                    msgType: MsgType.sent
                                 })
                             })
-                            setMessages(messages)
-                            setLoading(false)
+                            //add recv msgs
+                            firestore()
+                                .collection('users')
+                                .doc(route.params.userId)
+                                .collection('chats')
+                                .doc(chatUserDocId)
+                                .collection('received messages')
+                                .get().then((snapshot) => {
+                                    snapshot.docs.forEach((doc) => {
+                                        messages.push({
+                                            content: doc.data().content,
+                                            dateTime: doc.data().dateTime,
+                                            msgType: MsgType.received
+                                        })
+                                    })
+                                    setMessages(messages)
+                                    setLoading(false)
+                                })
                         });
-                    return () => subscriber();
+                    //listen to recv msgs
                 }
             })
     }, [refreshCount]);
@@ -98,18 +118,39 @@ export function ChatScreen() {
                             inverted={true}
                             data={messages}
                             keyExtractor={(item: ListItemType) => item.content}
-                            renderItem={({ item }) => (
-                                <Text style={{
-                                    fontSize: 18,
-                                    color: "#000000",
-                                    backgroundColor: "#6FC3FC",
-                                    marginBottom: 6,
-                                    paddingHorizontal: 8,
-                                    paddingVertical: 4,
-                                    alignSelf: "flex-end",
-                                    borderRadius: 6
-                                }} >{item.content}</Text>
-                            )}
+                            renderItem={({ item }) => {
+                                if(item.msgType == MsgType.sent) {
+                                    return (
+                                        <Text style={{
+                                            fontSize: 19,
+                                            color: "#000000",
+                                            backgroundColor: "#6BBAF0",
+                                            marginBottom: 6,
+                                            paddingHorizontal: 8,
+                                            paddingVertical: 4,
+                                            alignSelf: "flex-end",
+                                            borderTopLeftRadius: 8,
+                                            borderBottomLeftRadius: 8,
+                                            borderBottomRightRadius: 8
+                                        }} >{item.content}</Text>
+                                    )
+                                }
+                                return (
+                                    <Text style={{
+                                        fontSize: 19,
+                                        color: "#000000",
+                                        backgroundColor: "#00DDC0",
+                                        marginBottom: 6,
+                                        paddingHorizontal: 8,
+                                        paddingVertical: 4,
+                                        alignSelf: "flex-start",
+                                        borderTopRightRadius: 8,
+                                        borderBottomLeftRadius: 8,
+                                        borderBottomRightRadius: 8
+                                    }} >{item.content}</Text>
+                                )
+                            }
+                        }
                         />
                 }
 

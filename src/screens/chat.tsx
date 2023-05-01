@@ -78,7 +78,7 @@ export function ChatScreen() {
                                 .collection('chats')
                                 .doc(chatUserDocId)
                                 .collection('received messages')
-                                .get().then((snapshot) => {
+                                .onSnapshot((snapshot) => {
                                     snapshot.docs.forEach((doc) => {
                                         messages.push({
                                             content: doc.data().content,

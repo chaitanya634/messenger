@@ -4,7 +4,8 @@ import {
     View,
     GestureResponderEvent,
     StyleProp,
-    TextStyle
+    TextStyle,
+    ActivityIndicator
 } from "react-native"
 
 type Props = {
@@ -31,12 +32,16 @@ const CustomButton = (props: Props) => (
                 ? defaultEnableStyle
                 : defaultDisableStyle
         } >
-            <Text style={{
-                color: "#ffffff",
-                fontSize: 18
-            }} >
-                {props.text}
-            </Text>
+            {
+                (props.isDisabled == null || props.isDisabled == false)
+                ? <Text style={{
+                    color: "#ffffff",
+                    fontSize: 18
+                }} >
+                    {props.text}
+                </Text>
+                : <ActivityIndicator />
+            }
         </View>
     </TouchableOpacity>
 )

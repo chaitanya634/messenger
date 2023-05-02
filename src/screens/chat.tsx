@@ -27,10 +27,10 @@ function partition(
     start: number = 0,
     end: number = arr.length
 ) {
-    let pivot: number = arr[start].dateTime.toMillis()
+    let pivot: number = arr[start].msgOrderNum
     let swapIndex: number = start;
     for (let i = start + 1; i < end; i++) {
-        if (arr[i].dateTime.toMillis() < pivot) {
+        if (arr[i].msgOrderNum < pivot) {
             swapIndex++;
             swap(arr, i, swapIndex);
         }
@@ -69,8 +69,8 @@ export function ChatScreen() {
 
     //msg
     const [refreshCount, setRefreshCount] = useState(0)
-    const [loading, setLoading] = useState(true);
-    const [messages, setMessages] = useState([]);
+    const [loading, setLoading] = useState(true)
+    const [messages, setMessages] = useState([])
 
     let chatUserDocId = ""
 
@@ -123,9 +123,8 @@ export function ChatScreen() {
                                             msgType: MsgType.received,
                                         })
                                     })
-                                    console.log('toMills',messages[0].dateTime.toMillis())
-                                    
-                                    setMessages(QuickSort(messages).reverse())
+                                    const msgList = QuickSort(messages)
+                                    setMessages(msgList)
                                     setLoading(false)
                                 })
                         });
@@ -227,6 +226,8 @@ export function ChatScreen() {
                     text="Send"
                     isDisabled={isSendBtnDisabled}
                     onTap={() => {
+                        let msgOrderNum = messages.length + 1
+                        
                         if (msg.trim() == "") {
                             Alert.alert(
                                 "Message not sent",
@@ -260,9 +261,8 @@ export function ChatScreen() {
                                             }).then((res) => {
                                                 res.collection('sent messages').add({
                                                     content: msg,
-                                                    dateTime: firebase.firestore.FieldValue.serverTimestamp()
+                                                    msgOrderNum: msgOrderNum
                                                 }).then((r) => {
-
                                                     //received msgs
                                                     let recvChatDocId = ""
                                                     dbUsers.doc(route.params.chatUserId)
@@ -283,7 +283,7 @@ export function ChatScreen() {
                                                                     }).then((ss1) => {
                                                                         ss1.collection('received messages').add({
                                                                             content: msg,
-                                                                            dateTime: firebase.firestore.FieldValue.serverTimestamp()
+                                                                            msgOrderNum: msgOrderNum
                                                                         }).then((_) => {
                                                                             setMsg("")
                                                                             setIsSendBtnDisabled(false)
@@ -297,7 +297,7 @@ export function ChatScreen() {
                                                                     .doc(recvChatDocId).
                                                                     collection('received messages').add({
                                                                         content: msg,
-                                                                        dateTime: firebase.firestore.FieldValue.serverTimestamp()
+                                                                        msgOrderNum: msgOrderNum
                                                                     }).then((_) => {
                                                                         setMsg("")
                                                                         setIsSendBtnDisabled(false)
@@ -312,10 +312,9 @@ export function ChatScreen() {
                                         dbUsers.doc(route.params.userId)
                                             .collection('chats').doc(chatDocId).collection('sent messages').add({
                                                 content: msg,
-                                                dateTime: firebase.firestore.FieldValue.serverTimestamp()
+                                                msgOrderNum: msgOrderNum
                                             }).then((res) => {
                                                 console.log("Updated chat and added new msg");
-
                                                 //add to received msgs
                                                 let recvChatDocId = ""
                                                 dbUsers.doc(route.params.chatUserId)
@@ -336,7 +335,7 @@ export function ChatScreen() {
                                                                 }).then((ss1) => {
                                                                     ss1.collection('received messages').add({
                                                                         content: msg,
-                                                                        dateTime: firebase.firestore.FieldValue.serverTimestamp()
+                                                                        msgOrderNum: msgOrderNum
                                                                     }).then((_) => {
                                                                         setMsg("")
                                                                         setIsSendBtnDisabled(false)
@@ -348,7 +347,7 @@ export function ChatScreen() {
                                                                 .doc(recvChatDocId).
                                                                 collection('received messages').add({
                                                                     content: msg,
-                                                                    dateTime: firebase.firestore.FieldValue.serverTimestamp()
+                                                                    msgOrderNum: msgOrderNum
                                                                 }).then((_) => {
                                                                     setMsg("")
                                                                     setIsSendBtnDisabled(false)
@@ -359,6 +358,7 @@ export function ChatScreen() {
                                     }
                                 })
                         }
+                        
                     }}
                 />
             </View>

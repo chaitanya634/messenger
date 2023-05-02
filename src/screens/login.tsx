@@ -21,6 +21,7 @@ export function LoginScreen() {
       <TextInput
         style={{...ComponentStyles.textInput, marginBottom: 22}}
         placeholder="Please enter your email"
+        autoCapitalize="none"
         placeholderTextColor="#A7A7A7"
         onChangeText={(input) => setEmail(input)}
         defaultValue={email}

@@ -123,7 +123,7 @@ export function ChatScreen() {
                                             msgType: MsgType.received,
                                         })
                                     })
-                                    // messages[0].dateTime.toMillis()
+                                    console.log('toMills',messages[0].dateTime.toMillis())
                                     
                                     setMessages(QuickSort(messages).reverse())
                                     setLoading(false)
@@ -162,9 +162,7 @@ export function ChatScreen() {
                                 
                                 if (item.msgType == MsgType.sent) {
                                     return (
-                                        <Text style={{
-                                            fontSize: 19,
-                                            color: "#000000",
+                                        <View style={{
                                             backgroundColor: "#6BBAF0",
                                             marginBottom: 6,
                                             paddingHorizontal: 8,
@@ -173,14 +171,17 @@ export function ChatScreen() {
                                             borderTopLeftRadius: 8,
                                             borderBottomLeftRadius: 8,
                                             borderBottomRightRadius: 8
+                                        }}>
+                                            <Text style={{
+                                            fontSize: 19,
+                                            color: "#000000"
                                         }} >{item.content}</Text>
+                                        </View>
                                     )
                                 }
                                 return (
-                                    <Text style={{
-                                        fontSize: 19,
-                                        color: "#000000",
-                                        backgroundColor: "#00DDC0",
+                                    <View style={{
+                                        backgroundColor: "#00D1B5",
                                         marginBottom: 6,
                                         paddingHorizontal: 8,
                                         paddingVertical: 4,
@@ -188,7 +189,13 @@ export function ChatScreen() {
                                         borderTopRightRadius: 8,
                                         borderBottomLeftRadius: 8,
                                         borderBottomRightRadius: 8
+                                    }}>
+                                        <Text style={{
+                                        fontSize: 19,
+                                        color: "#000000",
+                                
                                     }} >{item.content}</Text>
+                                    </View>
                                 )
                             }
                             }
@@ -208,7 +215,8 @@ export function ChatScreen() {
                         paddingHorizontal: 13,
                         borderColor: "#525252",
                         color: "#525252",
-                        flex: 1
+                        flex: 1,
+                        height: 40
                     }}
                     placeholder="Please enter message"
                     placeholderTextColor="#A7A7A7"

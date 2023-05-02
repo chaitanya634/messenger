@@ -9,7 +9,8 @@ const ComponentStyles = StyleSheet.create({
       borderRadius: 12,
       paddingHorizontal: 13,
       borderColor: "#525252",
-      color: "#525252"
+      color: "#525252",
+      height: 52
     },
   })
 

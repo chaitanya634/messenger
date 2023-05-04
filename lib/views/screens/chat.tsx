@@ -69,11 +69,41 @@ function ChatScreen() {
                             inverted={true}
                             data={messages}
                             keyExtractor={(item: MsgItemType) => item.id}
-                            renderItem={({ item }) => (
-                                <Text>
-                                    {item.content}
-                                </Text>
-                            )}
+                            renderItem={({ item }) => {
+                                if(item.senderId == route.params.myId)
+                                    return (
+                                        <View style={{
+                                            alignSelf:"flex-end",
+                                            backgroundColor: "#67D4FF",
+                                            margin: 4,
+                                            paddingHorizontal: 8,
+                                            paddingVertical: 6,
+                                            borderTopLeftRadius: 8,
+                                            borderBottomLeftRadius: 8,
+                                            borderBottomRightRadius: 8
+                                        }}>
+                                        <Text>
+                                            {item.content}
+                                        </Text>
+                                        </View>
+                                    )
+                                return (
+                                    <View style={{
+                                        alignSelf:"flex-start",
+                                        backgroundColor: "#55D4AE",
+                                        margin: 4,
+                                        paddingHorizontal: 8,
+                                        paddingVertical: 6,
+                                        borderTopRightRadius: 8,
+                                        borderBottomLeftRadius: 8,
+                                        borderBottomRightRadius: 8
+                                    }}>
+                                    <Text style={{alignSelf:"flex-start"}} >
+                                        {item.content}
+                                    </Text>
+                                    </View>
+                                )
+                            }}
                         />
                     }
                

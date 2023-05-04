@@ -8,7 +8,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import CustomHeader from '../components/header';
 import OutlinedButton from '../components/OutlinedBtn';
 
-
+/*
 type ListItemType = {
     chatUserId: string,
     chatUserName: string,
@@ -71,7 +71,7 @@ function Users(props: any) {
         />
     );
 }
-
+*/
 function HomeScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<StackParams>>();
     const route = useRoute<RouteProp<ScreenParams, 'Home'>>()
@@ -114,13 +114,13 @@ function HomeScreen() {
                 </View>
 
                 {/* chats list */}
-                <View style={{ flex: 1, justifyContent: "center" }}>
+                {/* <View style={{ flex: 1, justifyContent: "center" }}>
                     <Users
                         userId={route.params.userId}
                         userName={route.params.userName}
                         // userEmail={route.params.userEmail}
                     />
-                </View>
+                </View> */}
             </View>
         </SafeAreaView>
     );

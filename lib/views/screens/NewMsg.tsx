@@ -8,77 +8,72 @@ import { ScreenParams, StackParams } from '../../../App';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 type ListItemType = {
-    chatUserId: string,
-    chatUserName: string,
-    chatUserEmail: string
+    firstName: string,
+    lastName: string,
+    userName: string
 }
 
-function Users(props: any) {
-    const [loading, setLoading] = useState(true);
-    const [users, setUsers] = useState([]);
-
+const NewMsg = () => {
+    const [isLoading, setIsLoading] = useState(true)
+    const [users, setUsers] = useState([])
+    const route = useRoute<RouteProp<ScreenParams, 'NewMsg'>>()
     const navigation = useNavigation<NativeStackNavigationProp<StackParams>>();
 
+
     useEffect(() => {
-        const subscriber = firebase.firestore()
+        firebase.firestore()
             .collection('users')
             .onSnapshot(querySnapshot => {
                 const users: any = [];
                 querySnapshot.docs.forEach((doc) => {
-                    if (doc.id != props.userId) {
+                    const data = doc.data()
+                    if (doc.id != route.params.userId) {
                         users.push({
-                            chatUserId: doc.id,
-                            // chatUserName: doc.data().userName,
-                            // chatUserEmail: doc.data().userEmail
+                            firstName: data.firstName,
+                            lastName: data.lastName,
+                            userName: data.userName
                         })
                     }
                 })
                 setUsers(users);
-                setLoading(false);
+                setIsLoading(false);
             });
-        return () => subscriber();
     }, []);
-    if (loading) {
-        return <ActivityIndicator />;
+
+
+    if (isLoading) {
+        return (
+            <SafeAreaView style={{ flex: 1, justifyContent: 'center' }}>
+                <ActivityIndicator />
+            </SafeAreaView>
+        )
     }
-    
+
     return (
         <FlatList
             data={users}
-            keyExtractor={(item: ListItemType) => item.chatUserEmail}
+            keyExtractor={(item: ListItemType) => item.userName}
             renderItem={({ item }) => (
                 <View style={{
+                    paddingHorizontal: 4,
                     paddingVertical: 6,
-                    alignItems: 'flex-start',
-                    justifyContent: 'center',
                     borderBottomWidth: 1
                 }}>
-                    
-                        <Text style={{ fontSize: 18, color: "#611313" }} >{item.chatUserName}</Text>
-                        <Text style={{ color: "#611313" }} >{item.chatUserEmail}</Text>
-                    
+                    <TouchableOpacity onPress={() => {
+                        navigation.navigate('Chat', {
+                            chatFirstName: item.firstName,
+                            chatLastName: item.lastName,
+                            chatUserName: item.userName
+                        })
+                    }} >
+                        <Text style={{ fontSize: 18, color: "#611313" }} >{item.firstName + " " + item.lastName}</Text>
+                        <Text style={{ color: "#611313" }} >{item.userName}</Text>
+                    </TouchableOpacity>
                 </View>
             )}
         />
-    );
-}
-
-const NewMsg = () => {
-
-    const route = useRoute<RouteProp<ScreenParams, 'NewMsg'>>()
-
-    return (
-        <SafeAreaView>
-            <Text style={{ color: 'black' }}>
-                New Msg
-            </Text>
-            <View style={{ flex: 1, justifyContent: "center" }}>
-                    <Users
-                        userId={route.params.userId}
-                    />
-            </View>
-        </SafeAreaView>
     )
+
 }
 
 export default NewMsg

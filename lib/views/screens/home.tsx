@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
-import { View, Text, SafeAreaView, ActivityIndicator, FlatList, TouchableOpacity } from "react-native"
+import { View, Text, SafeAreaView, ActivityIndicator, FlatList, TouchableOpacity, Button } from "react-native"
 import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
-import { ScreenParams, StackParams } from '../../App';
+import { ScreenParams, StackParams } from '../../../App'
 import CustomButton from '../components/CustomButton';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import CustomHeader from '../components/header';
+import OutlinedButton from '../components/OutlinedBtn';
 
-
+/*
 type ListItemType = {
     chatUserId: string,
     chatUserName: string,
@@ -70,36 +71,62 @@ function Users(props: any) {
         />
     );
 }
-
-
-export function HomeScreen() {
-    const navigation = useNavigation()
+*/
+function HomeScreen() {
+    const navigation = useNavigation<NativeStackNavigationProp<StackParams>>();
     const route = useRoute<RouteProp<ScreenParams, 'Home'>>()
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
-            <View style={{ margin: 12, flex: 1 }}>
-                {/* header */}
+            <View style={{ margin: 12, flex: 1}}>
                 <CustomHeader 
-                    title={route.params.userName}
-                    subtitle={route.params.userEmail}
+                    title={route.params.firstName+" "+route.params.lastName}
+                    subtitle={route.params.userName}
                     action={{text:"Logout",onPress: () => navigation.goBack()}}
                 />
 
+                <View style={{flexDirection:'row', alignSelf:'center', marginTop: 8, marginBottom:4 }} >
+                    <OutlinedButton 
+                        text='Requests'
+                        onTap={()=>{}}
+                    />
+                    <OutlinedButton 
+                        text='New Group'
+                        onTap={()=>{}}
+                    />
+                    <OutlinedButton 
+                        text='New Message'
+                        onTap={()=>{
+                            navigation.navigate("NewMsg",{
+                                myId: route.params.userId,
+                                myFirstName: route.params.firstName
+                            })
+                        }}
+                    />
+                </View>
+
                 {/* body */}
-                <Text style={{ marginTop: 12, marginBottom: 8, 
-                    color:"#7C7C7C",
-                    fontSize: 18, fontWeight: "bold" }}>My Chats</Text>
+                <View style={{marginBottom: 8}}>
+                    <Text style={{ 
+                            color:"#7C7C7C",
+                            fontSize: 18, 
+                            fontWeight: "bold"
+                        }}>
+                            My Chats
+                    </Text>
+                </View>
 
                 {/* chats list */}
-                <View style={{ flex: 1, justifyContent: "center" }}>
+                {/* <View style={{ flex: 1, justifyContent: "center" }}>
                     <Users
                         userId={route.params.userId}
                         userName={route.params.userName}
-                        userEmail={route.params.userEmail}
+                        // userEmail={route.params.userEmail}
                     />
-                </View>
+                </View> */}
             </View>
         </SafeAreaView>
     );
 }
+
+export default HomeScreen

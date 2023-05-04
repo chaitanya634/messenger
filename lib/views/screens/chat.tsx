@@ -82,7 +82,7 @@ function ChatScreen() {
                                             borderBottomLeftRadius: 8,
                                             borderBottomRightRadius: 8
                                         }}>
-                                        <Text>
+                                        <Text style={{fontSize: 16}}>
                                             {item.content}
                                         </Text>
                                         </View>
@@ -98,7 +98,7 @@ function ChatScreen() {
                                         borderBottomLeftRadius: 8,
                                         borderBottomRightRadius: 8
                                     }}>
-                                    <Text style={{alignSelf:"flex-start"}} >
+                                    <Text style={{fontSize: 16}} >
                                         {item.content}
                                     </Text>
                                     </View>

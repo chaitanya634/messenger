@@ -8,6 +8,13 @@ import ComponentStyles from "../styles/MyStylesheet";
 import firestore, { FirebaseFirestoreTypes, firebase } from '@react-native-firebase/firestore';
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
+type MsgItemType = {
+    id: string,
+    content: string,
+    createdAt: FirebaseFirestoreTypes.Timestamp,
+    senderFirstName: string,
+    senderId: string
+}
 
 function ChatScreen() {
     const navigation = useNavigation()
@@ -15,6 +22,30 @@ function ChatScreen() {
 
     const [message, setMessage] = useState("")
     const [isSendBtnDisabled, setIsSendBtnDisabled] = useState(false)
+
+    const [isLoading, setIsLoading] = useState(true)
+    const [messages, setMessages] = useState([])
+
+    useEffect(() => {
+        firebase.firestore()
+            .collection('chatRooms').doc('4NZ6wXQJCZex3FgJcU69')
+            .collection('messages').orderBy('createdAt','desc')
+            .onSnapshot(querySnapshot => {
+                const messages: any = [];
+                querySnapshot.docs.forEach((doc) => {
+                    const data = doc.data()
+                    messages.push({
+                        id: doc.id,
+                        content: data.content,
+                        createdAt: data.createdAt,
+                        senderFirstName: data.senderFirstName,
+                        senderId: data.senderId
+                    })
+                })
+                setMessages(messages);
+                setIsLoading(false);
+            });
+    }, []);
 
     return (
         <SafeAreaView style={{ flex: 1, margin: 12 }}>
@@ -31,7 +62,21 @@ function ChatScreen() {
                     marginVertical: 12,
                     justifyContent: "center"
                 }}>
-                <ActivityIndicator />
+                    {
+                        isLoading ?  
+                        <ActivityIndicator /> : 
+                        <FlatList
+                            inverted={true}
+                            data={messages}
+                            keyExtractor={(item: MsgItemType) => item.id}
+                            renderItem={({ item }) => (
+                                <Text>
+                                    {item.content}
+                                </Text>
+                            )}
+                        />
+                    }
+               
             </View>
 
             {/* footer */}

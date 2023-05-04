@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
-import { View, Text, SafeAreaView, ActivityIndicator, FlatList, TouchableOpacity } from "react-native"
+import { View, Text, SafeAreaView, ActivityIndicator, FlatList, TouchableOpacity, Button } from "react-native"
 import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { ScreenParams, StackParams } from '../../App';
 import CustomButton from '../components/CustomButton';
@@ -87,9 +87,17 @@ export function HomeScreen() {
                 />
 
                 {/* body */}
-                <Text style={{ marginTop: 12, marginBottom: 8, 
-                    color:"#7C7C7C",
-                    fontSize: 18, fontWeight: "bold" }}>My Chats</Text>
+                <View style={{marginTop: 12, marginBottom: 8, flexDirection:'row', alignItems:'center'}}>
+                    <Text style={{ 
+                            color:"#7C7C7C",
+                            fontSize: 18, 
+                            fontWeight: "bold"
+                        }}>
+                            My Chats
+                    </Text>
+                    
+
+                </View>
 
                 {/* chats list */}
                 <View style={{ flex: 1, justifyContent: "center" }}>

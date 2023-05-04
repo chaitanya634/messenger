@@ -13,6 +13,9 @@ function ChatScreen() {
     const navigation = useNavigation()
     const route = useRoute<RouteProp<ScreenParams, 'Chat'>>()
 
+    const [message, setMessage] = useState("")
+    const [isSendBtnDisabled, setIsSendBtnDisabled] = useState(false)
+
     return (
         <SafeAreaView style={{ flex: 1, margin: 12 }}>
             <CustomHeader
@@ -24,12 +27,11 @@ function ChatScreen() {
                 }}
             />
             <View style={{
-                flex: 1,
-                marginVertical: 12,
-                justifyContent: "center"
-            }}>
+                    flex: 1,
+                    marginVertical: 12,
+                    justifyContent: "center"
+                }}>
                 <ActivityIndicator />
-
             </View>
 
             {/* footer */}
@@ -48,148 +50,27 @@ function ChatScreen() {
                     }}
                     placeholder="Please enter message"
                     placeholderTextColor="#A7A7A7"
-                    onChangeText={(input) => {}}
-                    defaultValue={""}
+                    onChangeText={(input) => {setMessage(input)}}
+                    defaultValue={message}
                 />
                 <CustomButton
                     text="Send"
                     onTap={() => {
-
-                        /*
-                        let msgOrderNum = messages.length + 1
-                        
-                        if (msg.trim() == "") {
-                            Alert.alert(
-                                "Message not sent",
-                                "Please enter the message",
-                                undefined,
-                                { cancelable: true }
-                            )
-                        }
-                        else {
+                        if(message.length == 0) {
+                            Alert.alert("Cannot Send","Please enter message")
+                        } else {
                             setIsSendBtnDisabled(true)
-
-                            // add/update chat in sent msgs
-                            const dbUsers = firestore().collection('users')
-                            let chatDocId = ""
-                            dbUsers.doc(route.params.userId)
-                                .collection('chats').get()
-                                .then((chatDocs) => {
-                                    for (const doc of chatDocs.docs) {
-                                        if (doc.data().chatUserEmail == route.params.chatUserEmail) {
-                                            chatDocId = doc.id
-                                            break
-                                        }
-                                    }
-                                    if (chatDocId == "") {
-                                        //chat didnt exist, so add new
-                                        dbUsers.doc(route.params.userId)
-                                            .collection('chats').add({
-                                                chatUserEmail: route.params.chatUserEmail,
-                                                chatUserName: route.params.chatUserName,
-                                                chatUserId: route.params.chatUserId
-                                            }).then((res) => {
-                                                res.collection('sent messages').add({
-                                                    content: msg,
-                                                    msgOrderNum: msgOrderNum
-                                                }).then((r) => {
-                                                    //received msgs
-                                                    let recvChatDocId = ""
-                                                    dbUsers.doc(route.params.chatUserId)
-                                                        .collection('chats').get()
-                                                        .then((snapshot) => {
-                                                            for (const doc of snapshot.docs) {
-                                                                if (doc.data().chatUserEmail == route.params.userEmail) {
-                                                                    recvChatDocId = doc.id
-                                                                    break
-                                                                }
-                                                            }
-                                                            if (recvChatDocId == "") {
-                                                                dbUsers.doc(route.params.chatUserId)
-                                                                    .collection('chats').add({
-                                                                        chatUserId: route.params.userId,
-                                                                        chatUserName: route.params.userName,
-                                                                        chatUserEmail: route.params.userEmail
-                                                                    }).then((ss1) => {
-                                                                        ss1.collection('received messages').add({
-                                                                            content: msg,
-                                                                            msgOrderNum: msgOrderNum
-                                                                        }).then((_) => {
-                                                                            setMsg("")
-                                                                            setIsSendBtnDisabled(false)
-                                                                            setRefreshCount(refreshCount + 1)
-                                                                        })
-
-                                                                    })
-                                                            } else {
-                                                                dbUsers.doc(route.params.chatUserId)
-                                                                    .collection('chats')
-                                                                    .doc(recvChatDocId).
-                                                                    collection('received messages').add({
-                                                                        content: msg,
-                                                                        msgOrderNum: msgOrderNum
-                                                                    }).then((_) => {
-                                                                        setMsg("")
-                                                                        setIsSendBtnDisabled(false)
-                                                                        setRefreshCount(refreshCount + 1)
-                                                                    })
-                                                            }
-                                                        })
-                                                })
-                                            })
-                                    } else {
-                                        //chat exist so update it
-                                        dbUsers.doc(route.params.userId)
-                                            .collection('chats').doc(chatDocId).collection('sent messages').add({
-                                                content: msg,
-                                                msgOrderNum: msgOrderNum
-                                            }).then((res) => {
-                                                console.log("Updated chat and added new msg");
-                                                //add to received msgs
-                                                let recvChatDocId = ""
-                                                dbUsers.doc(route.params.chatUserId)
-                                                    .collection('chats').get()
-                                                    .then((snapshot) => {
-                                                        for (const doc of snapshot.docs) {
-                                                            if (doc.data().chatUserEmail == route.params.userEmail) {
-                                                                recvChatDocId = doc.id
-                                                                break
-                                                            }
-                                                        }
-                                                        if (recvChatDocId == "") {
-                                                            dbUsers.doc(route.params.chatUserId)
-                                                                .collection('chats').add({
-                                                                    chatUserId: route.params.userId,
-                                                                    chatUserName: route.params.userName,
-                                                                    chatUserEmail: route.params.userEmail
-                                                                }).then((ss1) => {
-                                                                    ss1.collection('received messages').add({
-                                                                        content: msg,
-                                                                        msgOrderNum: msgOrderNum
-                                                                    }).then((_) => {
-                                                                        setMsg("")
-                                                                        setIsSendBtnDisabled(false)
-                                                                    })
-                                                                })
-                                                        } else {
-                                                            dbUsers.doc(route.params.chatUserId)
-                                                                .collection('chats')
-                                                                .doc(recvChatDocId).
-                                                                collection('received messages').add({
-                                                                    content: msg,
-                                                                    msgOrderNum: msgOrderNum
-                                                                }).then((_) => {
-                                                                    setMsg("")
-                                                                    setIsSendBtnDisabled(false)
-                                                                })
-                                                        }
-                                                    })
-                                            })
-                                    }
-                                })
+                            firebase.firestore().collection("chatRooms").doc("4NZ6wXQJCZex3FgJcU69")
+                            .collection('messages').add({
+                                content: message,
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                senderFirstName: route.params.myFirstName,
+                                senderId: route.params.myId
+                            }).then((v)=>{
+                                setIsSendBtnDisabled(false)
+                                setMessage("")
+                            })
                         }
-                        */
-
                     }}
                 />
             </View>

@@ -27,7 +27,7 @@ const NewMsg = () => {
                 const users: any = [];
                 querySnapshot.docs.forEach((doc) => {
                     const data = doc.data()
-                    if (doc.id != route.params.userId) {
+                    if (doc.id != route.params.myId) {
                         users.push({
                             firstName: data.firstName,
                             lastName: data.lastName,
@@ -61,6 +61,8 @@ const NewMsg = () => {
                 }}>
                     <TouchableOpacity onPress={() => {
                         navigation.navigate('Chat', {
+                            myFirstName: route.params.myFirstName,
+                            myId: route.params.myId,
                             chatFirstName: item.firstName,
                             chatLastName: item.lastName,
                             chatUserName: item.userName

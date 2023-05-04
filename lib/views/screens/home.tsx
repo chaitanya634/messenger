@@ -97,7 +97,10 @@ function HomeScreen() {
                     <OutlinedButton 
                         text='New Message'
                         onTap={()=>{
-                            navigation.navigate("NewMsg",{userId: route.params.userId})
+                            navigation.navigate("NewMsg",{
+                                myId: route.params.userId,
+                                myFirstName: route.params.firstName
+                            })
                         }}
                     />
                 </View>

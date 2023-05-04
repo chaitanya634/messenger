@@ -24,12 +24,15 @@ export type ScreenParams = {
     lastName: string
   },
   Chat: {
+    myFirstName: string,
+    myId: string,
     chatFirstName: string,
     chatLastName: string,
     chatUserName: string,
   },
   NewMsg: {
-    userId: string
+    myId: string,
+    myFirstName: string
   }
 }
 

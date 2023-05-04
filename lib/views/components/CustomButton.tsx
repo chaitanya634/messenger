@@ -24,7 +24,7 @@ const CustomButton = (props: Props) => (
         }
         activeOpacity={
             (props.isDisabled == null || props.isDisabled == false)
-                ? 0.6
+                ? 0.9
                 : 1
         }>
         <View style={
@@ -57,7 +57,7 @@ const defaultEnableStyle: StyleProp<TextStyle> = {
 
 const defaultDisableStyle: StyleProp<TextStyle> = {
     ...defaultEnableStyle,
-    opacity: 0.6
+    opacity: 0.9
 }
 
 

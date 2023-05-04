@@ -11,23 +11,21 @@ type HeaderParams = {
 };
 
 const CustomHeader = (params: HeaderParams) => (
-    <View style={{ flexDirection: "row", paddingBottom: 6, alignItems:"center" }}>
+    <View style={{ flexDirection: "row", alignItems: "center" }}>
         <View style={{ flex: 1 }}>
             <Text style={styles.title}>{params.title}</Text>
             <Text style={styles.subtitle}>{params.subtitle}</Text>
         </View>
-        <View style={styles.buttonArea}>
-            <CustomButton
-                text={params.action.text}
-                onTap={params.action.onPress}
-            />
-        </View>
+        <CustomButton
+            text={params.action.text}
+            onTap={params.action.onPress}
+        />
     </View>
 )
 
 const styles = StyleSheet.create({
     title: {
-        fontSize: 28,
+        fontSize: 22,
         fontWeight: "400",
         color: "#940000"
     },
@@ -35,9 +33,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: "#940000"
     },
-    buttonArea: {
-        justifyContent: "center", marginRight: 6
-    }
 })
 
 export default CustomHeader;

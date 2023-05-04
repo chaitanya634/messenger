@@ -1,11 +1,10 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import { View, Text, SafeAreaView, Button, ActivityIndicator, TouchableOpacity, FlatList, TextInput, Alert } from "react-native";
-import { ScreenParams, StackParams } from "../../App";
-import { sendMsg } from "../firestore_functions";
+import { ScreenParams, StackParams } from "../../../App";
 import CustomHeader from "../components/header";
 import CustomButton from "../components/CustomButton";
-import ComponentStyles from "../styles";
+import ComponentStyles from "../styles/MyStylesheet";
 import firestore, { FirebaseFirestoreTypes, firebase } from '@react-native-firebase/firestore';
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
@@ -60,7 +59,7 @@ type MsgBodyParams = {
 }
 
 
-export function ChatScreen() {
+function ChatScreen() {
     const navigation = useNavigation()
     const route = useRoute<RouteProp<ScreenParams, 'Chat'>>()
 
@@ -365,3 +364,5 @@ export function ChatScreen() {
         </SafeAreaView>
     );
 }
+
+export default ChatScreen

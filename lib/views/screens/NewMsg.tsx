@@ -32,8 +32,13 @@ const NewMsg = () => {
                 })
                 setMyChatsUsername(myChatsUsername);
 
+                if(myChatsUsername.length == 0) {
+                    myChatsUsername.push('null')
+                }
+
                 firebase.firestore()
-                .collection('users').where('userName','not-in',myChatsUsername)
+                .collection('users')
+                .where('userName','not-in',myChatsUsername)
                 .onSnapshot(querySnapshot => {
                     const users: any = [];
                     querySnapshot.docs.forEach((doc) => {

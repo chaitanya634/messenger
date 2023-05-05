@@ -10,7 +10,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 type ListItemType = {
     firstName: string,
     lastName: string,
-    userName: string
+    userName: string,
+    id: string
 }
 
 const NewMsg = () => {
@@ -19,25 +20,42 @@ const NewMsg = () => {
     const route = useRoute<RouteProp<ScreenParams, 'NewMsg'>>()
     const navigation = useNavigation<NativeStackNavigationProp<StackParams>>();
 
+    const [myChatsUsername, setMyChatsUsername] = useState([])
 
     useEffect(() => {
         firebase.firestore()
-            .collection('users')
-            .onSnapshot(querySnapshot => {
-                const users: any = [];
-                querySnapshot.docs.forEach((doc) => {
-                    const data = doc.data()
-                    if (doc.id != route.params.myId) {
-                        users.push({
-                            firstName: data.firstName,
-                            lastName: data.lastName,
-                            userName: data.userName
-                        })
-                    }
+            .collection('users').doc(route.params.myId)
+            .collection('myChatRooms').get().then((val) => {
+                const myChatsUsername: any = [];
+                val.docs.forEach((doc) => {
+                    myChatsUsername.push(doc.data().chatUserName)
                 })
-                setUsers(users);
-                setIsLoading(false);
-            });
+                setMyChatsUsername(myChatsUsername);
+
+                if(myChatsUsername.length == 0) {
+                    myChatsUsername.push('null')
+                }
+
+                firebase.firestore()
+                .collection('users')
+                .where('userName','not-in',myChatsUsername)
+                .onSnapshot(querySnapshot => {
+                    const users: any = [];
+                    querySnapshot.docs.forEach((doc) => {
+                        const data = doc.data()
+                        if (doc.id != route.params.myId) {
+                            users.push({
+                                firstName: data.firstName,
+                                lastName: data.lastName,
+                                userName: data.userName,
+                                id: doc.id
+                            })
+                        }
+                    })
+                    setUsers(users);
+                    setIsLoading(false);
+                });
+            })
     }, []);
 
 
@@ -61,11 +79,16 @@ const NewMsg = () => {
                 }}>
                     <TouchableOpacity onPress={() => {
                         navigation.navigate('Chat', {
-                            myFirstName: route.params.myFirstName,
+                            chatRoomId: null,
                             myId: route.params.myId,
+                            myFirstName: route.params.myFirstName,
+                            myLastName: route.params.myLastName,
+                            myUserName: route.params.myUserName,
+                            chatId: item.id,
                             chatFirstName: item.firstName,
                             chatLastName: item.lastName,
-                            chatUserName: item.userName
+                            chatUserName: item.userName,
+                            isNewChat: true
                         })
                     }} >
                         <Text style={{ fontSize: 18, color: "#611313" }} >{item.firstName + " " + item.lastName}</Text>

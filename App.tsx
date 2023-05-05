@@ -18,21 +18,28 @@ export type StackParams = {
 
 export type ScreenParams = {
   Home: {
-    userId: string,
-    userName: string,
-    firstName: string,
-    lastName: string
+    myId: string,
+    myFirstName: string,
+    myLastName: string,
+    myUserName: string,
   },
   Chat: {
-    myFirstName: string,
+    chatRoomId: string | null
     myId: string,
+    myFirstName: string,
+    myLastName: string,
+    myUserName: string,
+    chatId: string,
     chatFirstName: string,
     chatLastName: string,
     chatUserName: string,
+    isNewChat: boolean
   },
   NewMsg: {
     myId: string,
-    myFirstName: string
+    myFirstName: string,
+    myLastName: string,
+    myUserName: string,
   }
 }
 

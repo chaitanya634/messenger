@@ -49,10 +49,6 @@ function HomeScreen() {
                         onTap={()=>{}}
                     />
                     <OutlinedButton 
-                        text='New Group'
-                        onTap={()=>{}}
-                    />
-                    <OutlinedButton 
                         text='New Message'
                         onTap={()=>{
                             navigation.navigate("NewMsg",{

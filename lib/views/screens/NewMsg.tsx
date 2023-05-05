@@ -19,25 +19,36 @@ const NewMsg = () => {
     const route = useRoute<RouteProp<ScreenParams, 'NewMsg'>>()
     const navigation = useNavigation<NativeStackNavigationProp<StackParams>>();
 
+    const [myChatsUsername, setMyChatsUsername] = useState([])
 
     useEffect(() => {
         firebase.firestore()
-            .collection('users')
-            .onSnapshot(querySnapshot => {
-                const users: any = [];
-                querySnapshot.docs.forEach((doc) => {
-                    const data = doc.data()
-                    if (doc.id != route.params.myId) {
-                        users.push({
-                            firstName: data.firstName,
-                            lastName: data.lastName,
-                            userName: data.userName
-                        })
-                    }
+            .collection('users').doc(route.params.myId)
+            .collection('myChatRooms').get().then((val) => {
+                const myChatsUsername: any = [];
+                val.docs.forEach((doc) => {
+                    myChatsUsername.push(doc.data().subtitle)
                 })
-                setUsers(users);
-                setIsLoading(false);
-            });
+                setMyChatsUsername(myChatsUsername);
+
+                firebase.firestore()
+                .collection('users').where('userName','not-in',myChatsUsername)
+                .onSnapshot(querySnapshot => {
+                    const users: any = [];
+                    querySnapshot.docs.forEach((doc) => {
+                        const data = doc.data()
+                        if (doc.id != route.params.myId) {
+                            users.push({
+                                firstName: data.firstName,
+                                lastName: data.lastName,
+                                userName: data.userName
+                            })
+                        }
+                    })
+                    setUsers(users);
+                    setIsLoading(false);
+                });
+            })
     }, []);
 
 

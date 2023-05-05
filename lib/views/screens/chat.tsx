@@ -26,7 +26,7 @@ function ChatScreen() {
     const [isLoading, setIsLoading] = useState(true)
     const [messages, setMessages] = useState([])
 
-    let roomId: string | null = route.params.chatRoomId
+    const [roomId, setRoomId] = useState(route.params.chatRoomId)
 
     useEffect(() => {
         firebase.firestore()
@@ -47,7 +47,7 @@ function ChatScreen() {
                 setMessages(messages);
                 setIsLoading(false);
             });
-    }, []);
+    }, [roomId]);
 
     return (
         <SafeAreaView style={{ flex: 1, margin: 12 }}>
@@ -143,16 +143,10 @@ function ChatScreen() {
                                 firebase.firestore().collection('chatRooms').add({
                                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                                 }).then((res) => {
-                                    roomId = res.id
-
-                                    firebase.firestore().collection('temp').doc('y91NAsdHHM34VKCmAJxB').set({
-                                        roomId: roomId
-                                    })
-
                                     //add room details to my account
                                     firebase.firestore().collection('users').doc(route.params.myId)
                                     .collection('myChatRooms').add({
-                                        chatRoomId: roomId,
+                                        chatRoomId: res.id,
                                         myId: route.params.myId,
                                         myFirstName: route.params.myFirstName,
                                         myLastName: route.params.myLastName,
@@ -165,7 +159,7 @@ function ChatScreen() {
                                         //add room details to chat account
                                         firebase.firestore().collection('users').doc(route.params.chatId)
                                         .collection('myChatRooms').add({
-                                            chatRoomId: roomId,
+                                            chatRoomId: res.id,
                                             myId: route.params.chatId,
                                             myFirstName: route.params.chatFirstName,
                                             myLastName: route.params.chatLastName,
@@ -185,6 +179,7 @@ function ChatScreen() {
                                         }).then((_)=>{
                                             setIsSendBtnDisabled(false)
                                             setMessage("")
+                                            setRoomId(res.id)
                                         })
                                     })
                                 })

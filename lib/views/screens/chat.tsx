@@ -134,6 +134,10 @@ function ChatScreen() {
                         if(message.length == 0) {
                             Alert.alert("Cannot Send","Please enter message")
                         } else {
+                            
+                            //check if chat room exists
+                            // firebase.firestore().collection('users').doc(route.params.myId).collection('myChatRooms').
+                            /*
                             setIsSendBtnDisabled(true)
                             firebase.firestore().collection("chatRooms").doc("4NZ6wXQJCZex3FgJcU69")
                             .collection('messages').add({
@@ -145,6 +149,7 @@ function ChatScreen() {
                                 setIsSendBtnDisabled(false)
                                 setMessage("")
                             })
+                            */
                         }
                     }}
                 />

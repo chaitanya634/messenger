@@ -65,7 +65,7 @@ const NewMsg = () => {
                             myId: route.params.myId,
                             chatFirstName: item.firstName,
                             chatLastName: item.lastName,
-                            chatUserName: item.userName
+                            chatUserName: item.userName,
                         })
                     }} >
                         <Text style={{ fontSize: 18, color: "#611313" }} >{item.firstName + " " + item.lastName}</Text>

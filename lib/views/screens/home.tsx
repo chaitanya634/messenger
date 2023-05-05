@@ -1,80 +1,38 @@
 import React, { useEffect, useState } from 'react'
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { View, Text, SafeAreaView, ActivityIndicator, FlatList, TouchableOpacity, Button } from "react-native"
-import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
+import { FirebaseFirestoreTypes, firebase } from '@react-native-firebase/firestore';
 import { ScreenParams, StackParams } from '../../../App'
 import CustomButton from '../components/CustomButton';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import CustomHeader from '../components/header';
 import OutlinedButton from '../components/OutlinedBtn';
 
-/*
-type ListItemType = {
-    chatUserId: string,
-    chatUserName: string,
-    chatUserEmail: string
+type ChatItemType = {
+    id: string, 
+    title: string,
+    subtitle: string
 }
 
-function Users(props: any) {
-    const [loading, setLoading] = useState(true);
-    const [users, setUsers] = useState([]);
-
-    const navigation = useNavigation<NativeStackNavigationProp<StackParams>>();
-
-    useEffect(() => {
-        const subscriber = firestore()
-            .collection('users')
-            .onSnapshot(querySnapshot => {
-                const users: any = [];
-                querySnapshot.docs.forEach((doc) => {
-                    if (doc.id != props.userId) {
-                        users.push({
-                            chatUserId: doc.id,
-                            chatUserName: doc.data().userName,
-                            chatUserEmail: doc.data().userEmail
-                        })
-                    }
-                })
-                setUsers(users);
-                setLoading(false);
-            });
-        return () => subscriber();
-    }, []);
-    if (loading) {
-        return <ActivityIndicator />;
-    }
-    
-    return (
-        <FlatList
-            data={users}
-            keyExtractor={(item: ListItemType) => item.chatUserEmail}
-            renderItem={({ item }) => (
-                <View style={{
-                    paddingVertical: 6,
-                    alignItems: 'flex-start',
-                    justifyContent: 'center',
-                    borderBottomWidth: 1
-                }}>
-                    <TouchableOpacity onPress={() => navigation.navigate('Chat',{
-                        userId: props.userId,
-                        userName: props.userName,
-                        userEmail: props.userEmail,
-                        chatUserId: item.chatUserId,
-                        chatUserName: item.chatUserName,
-                        chatUserEmail: item.chatUserEmail
-                    })} >
-                        <Text style={{ fontSize: 18, color: "#611313" }} >{item.chatUserName}</Text>
-                        <Text style={{ color: "#611313" }} >{item.chatUserEmail}</Text>
-                    </TouchableOpacity>
-                </View>
-            )}
-        />
-    );
-}
-*/
 function HomeScreen() {
     const navigation = useNavigation<NativeStackNavigationProp<StackParams>>();
     const route = useRoute<RouteProp<ScreenParams, 'Home'>>()
+
+    const [isLoading, setIsLoading] = useState(true)
+    const [chats, setChats] = useState([])
+
+    useEffect(() => {
+        firebase.firestore()
+            .collection('users').doc(route.params.userId)
+            .collection('myChatRooms').onSnapshot(querySnapshot => {
+                const chats: any = [];
+                querySnapshot.docs.forEach((doc) => {
+                    chats.push(doc.data())
+                })
+                setChats(chats);
+                setIsLoading(false);
+            });
+    }, []);
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -105,8 +63,7 @@ function HomeScreen() {
                     />
                 </View>
 
-                {/* body */}
-                <View style={{marginBottom: 8}}>
+                <View>
                     <Text style={{ 
                             color:"#7C7C7C",
                             fontSize: 18, 
@@ -117,13 +74,36 @@ function HomeScreen() {
                 </View>
 
                 {/* chats list */}
-                {/* <View style={{ flex: 1, justifyContent: "center" }}>
-                    <Users
-                        userId={route.params.userId}
-                        userName={route.params.userName}
-                        // userEmail={route.params.userEmail}
-                    />
-                </View> */}
+                <View style={{
+                    flex: 1,
+                    marginVertical: 2,
+                    justifyContent: "center"
+                }}>
+                    {
+                        isLoading 
+                        ? 
+                            <ActivityIndicator/>
+                        :
+                        <FlatList
+                            data={chats}
+                            keyExtractor={(item: ChatItemType) => item.id}
+                            renderItem={({ item }) => 
+                                <View style={{
+                                    paddingHorizontal: 4,
+                                    paddingVertical: 6,
+                                    borderBottomWidth: 1
+                                }}>
+                                    <TouchableOpacity onPress={() => {}} >
+                                        <Text style={{ fontSize: 18, color: "#611313" }} >{item.title}</Text>
+                                        <Text style={{ color: "#611313" }} >{item.subtitle}</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            }
+                        />
+                    }
+
+                </View>
+                
             </View>
         </SafeAreaView>
     );

@@ -78,7 +78,7 @@ const NewMsg = () => {
                     borderBottomWidth: 1
                 }}>
                     <TouchableOpacity onPress={() => {
-                        navigation.navigate('Chat', {
+                        navigation.replace('Chat', {
                             chatRoomId: null,
                             myId: route.params.myId,
                             myFirstName: route.params.myFirstName,

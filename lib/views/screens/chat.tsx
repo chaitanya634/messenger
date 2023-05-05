@@ -26,10 +26,12 @@ function ChatScreen() {
     const [isLoading, setIsLoading] = useState(true)
     const [messages, setMessages] = useState([])
 
+    let roomId: string | null = route.params.chatRoomId
+
     useEffect(() => {
         firebase.firestore()
-            .collection('chatRooms').doc('4NZ6wXQJCZex3FgJcU69')
-            .collection('messages').orderBy('createdAt','desc')
+            .collection('chatRooms').doc(roomId ?? "")
+            .collection('messages').orderBy('createdAt', 'desc')
             .onSnapshot(querySnapshot => {
                 const messages: any = [];
                 querySnapshot.docs.forEach((doc) => {
@@ -50,7 +52,7 @@ function ChatScreen() {
     return (
         <SafeAreaView style={{ flex: 1, margin: 12 }}>
             <CustomHeader
-                title={route.params.chatFirstName+" "+route.params.chatLastName}
+                title={route.params.chatFirstName + " " + route.params.chatLastName}
                 subtitle={route.params.chatUserName}
                 action={{
                     text: "Back",
@@ -58,22 +60,22 @@ function ChatScreen() {
                 }}
             />
             <View style={{
-                    flex: 1,
-                    marginVertical: 12,
-                    justifyContent: "center"
-                }}>
-                    {
-                        isLoading ?  
-                        <ActivityIndicator /> : 
+                flex: 1,
+                marginVertical: 12,
+                justifyContent: "center"
+            }}>
+                {
+                    isLoading ?
+                        <ActivityIndicator /> :
                         <FlatList
                             inverted={true}
                             data={messages}
                             keyExtractor={(item: MsgItemType) => item.id}
                             renderItem={({ item }) => {
-                                if(item.senderId == route.params.myId)
+                                if (item.senderId == route.params.myId)
                                     return (
                                         <View style={{
-                                            alignSelf:"flex-end",
+                                            alignSelf: "flex-end",
                                             backgroundColor: "#67D4FF",
                                             margin: 4,
                                             paddingHorizontal: 8,
@@ -82,14 +84,14 @@ function ChatScreen() {
                                             borderBottomLeftRadius: 8,
                                             borderBottomRightRadius: 8
                                         }}>
-                                        <Text style={{fontSize: 16}}>
-                                            {item.content}
-                                        </Text>
+                                            <Text style={{ fontSize: 16 }}>
+                                                {item.content}
+                                            </Text>
                                         </View>
                                     )
                                 return (
                                     <View style={{
-                                        alignSelf:"flex-start",
+                                        alignSelf: "flex-start",
                                         backgroundColor: "#55D4AE",
                                         margin: 4,
                                         paddingHorizontal: 8,
@@ -98,15 +100,15 @@ function ChatScreen() {
                                         borderBottomLeftRadius: 8,
                                         borderBottomRightRadius: 8
                                     }}>
-                                    <Text style={{fontSize: 16}} >
-                                        {item.content}
-                                    </Text>
+                                        <Text style={{ fontSize: 16 }} >
+                                            {item.content}
+                                        </Text>
                                     </View>
                                 )
                             }}
                         />
-                    }
-               
+                }
+
             </View>
 
             {/* footer */}
@@ -125,31 +127,75 @@ function ChatScreen() {
                     }}
                     placeholder="Please enter message"
                     placeholderTextColor="#A7A7A7"
-                    onChangeText={(input) => {setMessage(input)}}
+                    onChangeText={(input) => { setMessage(input) }}
                     defaultValue={message}
                 />
                 <CustomButton
                     text="Send"
                     onTap={() => {
-                        if(message.length == 0) {
-                            Alert.alert("Cannot Send","Please enter message")
+                        if (message.length == 0) {
+                            Alert.alert("Cannot Send", "Please enter message")
                         } else {
-                            
-                            //check if chat room exists
-                            // firebase.firestore().collection('users').doc(route.params.myId).collection('myChatRooms').
-                            /*
                             setIsSendBtnDisabled(true)
-                            firebase.firestore().collection("chatRooms").doc("4NZ6wXQJCZex3FgJcU69")
-                            .collection('messages').add({
-                                content: message,
-                                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                                senderFirstName: route.params.myFirstName,
-                                senderId: route.params.myId
-                            }).then((v)=>{
-                                setIsSendBtnDisabled(false)
-                                setMessage("")
-                            })
-                            */
+                            if (roomId == null) {
+                                //create new room
+                                console.log('create new room')
+                                firebase.firestore().collection('chatRooms').add({
+                                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                }).then((res) => {
+                                    roomId = res.id
+
+                                    //add room details to my account
+                                    firebase.firestore().collection('users').doc(route.params.myId)
+                                    .collection('myChatRooms').add({
+                                        chatRoomId: roomId,
+                                        myId: route.params.myId,
+                                        myFirstName: route.params.myFirstName,
+                                        myLastName: route.params.myLastName,
+                                        myUserName: route.params.myUserName,
+                                        chatId: route.params.chatId,
+                                        chatFirstName: route.params.chatFirstName,
+                                        chatLastName: route.params.chatLastName,
+                                        chatUserName: route.params.chatUserName
+                                    }).then((_)=>{
+                                        //add room details to chat account
+                                        firebase.firestore().collection('users').doc(route.params.chatId)
+                                        .collection('myChatRooms').add({
+                                            chatRoomId: roomId,
+                                            myId: route.params.chatId,
+                                            myFirstName: route.params.chatFirstName,
+                                            myLastName: route.params.chatLastName,
+                                            myUserName: route.params.chatUserName,
+                                            chatId: route.params.myId,
+                                            chatFirstName: route.params.myFirstName,
+                                            chatLastName: route.params.myLastName,
+                                            chatUserName: route.params.myUserName
+                                        })
+                                    }).then((_)=>{
+                                        //add message
+                                        res.collection('messages').add({
+                                            content: message,
+                                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                            senderFirstName: route.params.myFirstName,
+                                            senderId: route.params.myId
+                                        }).then((_)=>{
+                                            setIsSendBtnDisabled(false)
+                                            setMessage("")
+                                        })
+                                    })
+                                })
+                            } else {
+                                firebase.firestore().collection("chatRooms").doc(roomId)
+                                    .collection('messages').add({
+                                        content: message,
+                                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                        senderFirstName: route.params.myFirstName,
+                                        senderId: route.params.myId
+                                    }).then((v) => {
+                                        setIsSendBtnDisabled(false)
+                                        setMessage("")
+                                    })
+                            }
                         }
                     }}
                 />

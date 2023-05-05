@@ -39,10 +39,10 @@ function LoginScreen() {
                   const userDoc = res.docs[0]
                   const userData = userDoc.data()
                   navigation.navigate('Home',{
-                    userId: userDoc.id,
-                    userName: userData.userName,
-                    firstName: userData.firstName,
-                    lastName: userData.lastName
+                    myId: userDoc.id,
+                    myFirstName: userData.firstName,
+                    myLastName: userData.lastName,
+                    myUserName: userData.userName
                   })
                   setUsername("")
                 }

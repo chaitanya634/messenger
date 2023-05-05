@@ -37,10 +37,6 @@ function HomeScreen() {
                 })
                 setChats(chats);
                 setIsLoading(false);
-
-                console.log('====================================');
-                console.log(chats);
-                console.log('====================================');
             });
     }, []);
 
@@ -111,7 +107,8 @@ function HomeScreen() {
                                             chatId: item.chatId,
                                             chatFirstName: item.chatFirstName,
                                             chatLastName: item.chatLastName,
-                                            chatUserName: item.chatUserName
+                                            chatUserName: item.chatUserName,
+                                            isNewChat: false
                                         })
                                     }} >
                                         <Text style={{ fontSize: 18, color: "#611313" }} >{`${item.chatFirstName} ${item.chatLastName}`}</Text>

@@ -145,6 +145,10 @@ function ChatScreen() {
                                 }).then((res) => {
                                     roomId = res.id
 
+                                    firebase.firestore().collection('temp').doc('y91NAsdHHM34VKCmAJxB').set({
+                                        roomId: roomId
+                                    })
+
                                     //add room details to my account
                                     firebase.firestore().collection('users').doc(route.params.myId)
                                     .collection('myChatRooms').add({

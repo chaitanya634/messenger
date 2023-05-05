@@ -33,6 +33,7 @@ export type ScreenParams = {
     chatFirstName: string,
     chatLastName: string,
     chatUserName: string,
+    isNewChat: boolean
   },
   NewMsg: {
     myId: string,

@@ -87,7 +87,8 @@ const NewMsg = () => {
                             chatId: item.id,
                             chatFirstName: item.firstName,
                             chatLastName: item.lastName,
-                            chatUserName: item.userName
+                            chatUserName: item.userName,
+                            isNewChat: true
                         })
                     }} >
                         <Text style={{ fontSize: 18, color: "#611313" }} >{item.firstName + " " + item.lastName}</Text>

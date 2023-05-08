@@ -5,11 +5,13 @@ type Props = {
     isLoading: boolean,
     isBlocked: boolean,
     blockedMsg: string,
+    showUnblockBtn: boolean,
+    onUnblockBtnPressed: (event: GestureResponderEvent) => void,
     footer: {
         defaultMsg: string
         onMsgTyped: ((text: string) => void)
         onSendBtnPressed: (event: GestureResponderEvent) => void
-    }
+    },
     chatDialog: {
         showDialog: boolean,
         dialogMsg: string,
@@ -32,6 +34,25 @@ const ChatFooter = (props: Props) => {
         }}>
             {props.blockedMsg}
         </Text>
+    }
+    if (props.showUnblockBtn) {
+        return (
+            <View>
+                <Text style={{
+                    fontWeight: "bold",
+                    color: 'black',
+                    textAlign: "center",
+                    fontSize: 18,
+                    marginBottom: 8,
+                }}>
+                    You have blocked this chat
+                </Text>
+                <CustomButton 
+                    text="Unblock" 
+                    onTap={props.onUnblockBtnPressed} 
+                />
+            </View>
+        )
     }
     if (props.chatDialog.showDialog) {
         return (

@@ -34,6 +34,7 @@ function ChatScreen() {
     const [isBottomLoading, setIsBottomLoading] = useState(true)
     const [isChatBlocked, setIsChatBlocked] = useState(false)
     const [showChatAck, setShowChatAck] = useState(false)
+    const [showUnblockBtn, setShowUnblockBtn] = useState(false)
 
     useEffect(() => {
         firebase.firestore()
@@ -68,6 +69,12 @@ function ChatScreen() {
                             else if (roomData?.createdBy != route.params.myId
                                 && roomData?.isAccepted) {
                                 setIsBottomLoading(false)
+                            }
+                            //receiver acc & blocked
+                            else if (roomData?.createdBy != route.params.myId
+                                && roomData?.isBlocked) {
+                                setIsBottomLoading(false)
+                                setShowUnblockBtn(true)
                             }
                             //sender acc & blocked
                             else if (roomData?.createdBy == route.params.myId && roomData?.isBlocked) {
@@ -155,6 +162,19 @@ function ChatScreen() {
                 isLoading={isBottomLoading}
                 isBlocked={isChatBlocked}
                 blockedMsg={`${route.params.chatFirstName} ${route.params.chatLastName} (${route.params.chatUserName}) has blocked this chat`}
+                showUnblockBtn={showUnblockBtn}
+                onUnblockBtnPressed={() => {
+                    firebase.firestore().collection('chatRooms')
+                    .doc(route.params?.chatRoomId ?? "").set({
+                        createdBy: route.params.chatId,
+                        isAccepted: true,
+                        isBlocked: false
+                    }).then((_)=>{
+                        setIsChatBlocked(false)
+                        setShowChatAck(false)
+                        setShowUnblockBtn(false)
+                    })
+                }}
                 footer={{
                     defaultMsg: message,
                     onMsgTyped(msg) { setMessage(msg) },
@@ -236,6 +256,9 @@ function ChatScreen() {
                                 isBlocked: true,
                                 isAccepted: false,
                                 createdBy: route.params.chatId,
+                            }).then((_)=>{
+                                setShowChatAck(false)
+                                setShowUnblockBtn(true)
                             })
                     },
                     onDeleteBtnPressed(event) { },

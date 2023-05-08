@@ -7,6 +7,7 @@ import CustomButton from "../components/CustomButton";
 import ComponentStyles from "../styles/MyStylesheet";
 import firestore, { FirebaseFirestoreTypes, firebase } from '@react-native-firebase/firestore';
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import ChatFooter from "../components/ChatFooter";
 
 type MsgItemType = {
     id: string,
@@ -15,6 +16,8 @@ type MsgItemType = {
     senderFirstName: string,
     senderId: string
 }
+
+
 
 function ChatScreen() {
     const navigation = useNavigation()
@@ -30,6 +33,8 @@ function ChatScreen() {
 
     const [showBottom, setShowBottom] = useState(true)
     const [isBottomLoading, setIsBottomLoading] = useState(true)
+
+    const [isChatBlocked, setIsChatBlocked] = useState(false)
 
     useEffect(() => {
         firebase.firestore()
@@ -59,11 +64,17 @@ function ChatScreen() {
                                 setIsBottomLoading(false)
                                 setShowBottom(false)
                             }
-                            else if(roomData?.createdBy != route.params.myId
+                            //receiver acc & accepted
+                            else if (roomData?.createdBy != route.params.myId
                                 && roomData?.isAccepted) {
-                                    setIsBottomLoading(false)
-                                    setShowBottom(true)
-                                }
+                                setIsBottomLoading(false)
+                                setShowBottom(true)
+                            }
+                            //sender acc & blocked
+                            else if (roomData?.createdBy == route.params.myId && roomData?.isBlocked) {
+                                setIsBottomLoading(false)
+                                setIsChatBlocked(true)
+                            }
                             else {
                                 //sender account
                                 setIsBottomLoading(false)
@@ -140,9 +151,98 @@ function ChatScreen() {
             </View>
 
             {/* footer */}
+            <ChatFooter
+                isLoading={isBottomLoading}
+                isBlocked={isChatBlocked}
+                blockedMsg={`${route.params.chatFirstName} ${route.params.chatLastName} (${route.params.chatUserName}) has blocked this chat`}
+                footer={{
+                    defaultMsg: message,
+                    onMsgTyped(msg) { setMessage(msg) },
+                    onSendBtnPressed(event) {
+                        if (message.length == 0) {
+                            Alert.alert("Cannot Send", "Please enter message")
+                        } else {
+                            setIsSendBtnDisabled(true)
+                            if (roomId == null) {
+                                //create new room
+                                console.log('create new room')
+                                firebase.firestore().collection('chatRooms').add({
+                                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                    createdBy: route.params.myId,
+                                    isAccepted: false,
+                                    isBlocked: false
+                                }).then((res) => {
+                                    //add room details to my account
+                                    firebase.firestore().collection('users').doc(route.params.myId)
+                                        .collection('myChatRooms').add({
+                                            chatRoomId: res.id,
+                                            myId: route.params.myId,
+                                            myFirstName: route.params.myFirstName,
+                                            myLastName: route.params.myLastName,
+                                            myUserName: route.params.myUserName,
+                                            chatId: route.params.chatId,
+                                            chatFirstName: route.params.chatFirstName,
+                                            chatLastName: route.params.chatLastName,
+                                            chatUserName: route.params.chatUserName
+                                        }).then((_) => {
+                                            //add room details to chat account
+                                            firebase.firestore().collection('users').doc(route.params.chatId)
+                                                .collection('myChatRooms').add({
+                                                    chatRoomId: res.id,
+                                                    myId: route.params.chatId,
+                                                    myFirstName: route.params.chatFirstName,
+                                                    myLastName: route.params.chatLastName,
+                                                    myUserName: route.params.chatUserName,
+                                                    chatId: route.params.myId,
+                                                    chatFirstName: route.params.myFirstName,
+                                                    chatLastName: route.params.myLastName,
+                                                    chatUserName: route.params.myUserName
+                                                })
+                                        }).then((_) => {
+                                            //add message
+                                            res.collection('messages').add({
+                                                content: message,
+                                                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                                senderFirstName: route.params.myFirstName,
+                                                senderId: route.params.myId
+                                            }).then((_) => {
+                                                setIsSendBtnDisabled(false)
+                                                setMessage("")
+                                                setRoomId(res.id)
+                                            })
+                                        })
+                                })
+                            } else {
+                                firebase.firestore().collection("chatRooms").doc(roomId)
+                                    .collection('messages').add({
+                                        content: message,
+                                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                        senderFirstName: route.params.myFirstName,
+                                        senderId: route.params.myId
+                                    }).then((v) => {
+                                        setIsSendBtnDisabled(false)
+                                        setMessage("")
+                                    })
+                            }
+                        }
+                    },
+                }}
+                chatDialog={{
+                    showDialog:false,
+                    dialogMsg: `Accept message request from ${route.params.chatFirstName} ${route.params.chatLastName} (${route.params.chatUserName}) ?`,
+                    onBlockBtnPressed(event) {},
+                    onDeleteBtnPressed(event) {},
+                    onAcceptBtnPressed(event) {},
+                }}
+            />
             {
-                isBottomLoading ? <ActivityIndicator/> :
-                showBottom ?
+                /*
+                isBottomLoading 
+                ? 
+                <ActivityIndicator/> 
+                :
+                showBottom
+                ?
                     <View style={{ flexDirection: "row", alignItems: "center" }} >
                         <TextInput
                             style={{
@@ -232,7 +332,12 @@ function ChatScreen() {
                                 }
                             }}
                         />
-                    </View> : 
+                    </View> 
+                : 
+                isChatBlocked 
+                ?
+                            <Text>BLOCKED</Text>
+                :
                     <View style={{borderWidth: 1, padding: 6}}>
                         <Text 
                             style={{
@@ -268,9 +373,11 @@ function ChatScreen() {
                             }}/>
                         </View>
                     </View>
+                    */
             }
         </SafeAreaView>
     );
 }
 
 export default ChatScreen
+

@@ -142,6 +142,9 @@ function ChatScreen() {
                                 console.log('create new room')
                                 firebase.firestore().collection('chatRooms').add({
                                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                    createdBy: route.params.myId,
+                                    isAccepted: false,
+                                    isBlocked: false
                                 }).then((res) => {
                                     //add room details to my account
                                     firebase.firestore().collection('users').doc(route.params.myId)

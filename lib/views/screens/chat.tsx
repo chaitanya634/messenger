@@ -33,7 +33,7 @@ function ChatScreen() {
             .collection('chatRooms').doc(roomId ?? "")
             .collection('messages').orderBy('createdAt', 'desc')
             .onSnapshot(querySnapshot => {
-                const messages: any = [];
+                const messages: any = []
                 querySnapshot.docs.forEach((doc) => {
                     const data = doc.data()
                     messages.push({
@@ -45,9 +45,10 @@ function ChatScreen() {
                     })
                 })
                 setMessages(messages);
-                setIsLoading(false);
-            });
-    }, [roomId]);
+                // setIsLoading(false);
+                
+            })
+    }, [roomId])
 
     return (
         <SafeAreaView style={{ flex: 1, margin: 12 }}>

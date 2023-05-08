@@ -59,7 +59,18 @@ function ChatScreen() {
                                 setIsBottomLoading(false)
                                 setShowBottom(false)
                             }
+                            else if(roomData?.createdBy != route.params.myId
+                                && roomData?.isAccepted) {
+                                    setIsBottomLoading(false)
+                                    setShowBottom(true)
+                                }
+                            else {
+                                //sender account
+                                setIsBottomLoading(false)
+                            }
                         })
+                } else {
+                    setIsBottomLoading(false)
                 }
                 setIsLoading(false);
                 setMessages(messages);
@@ -131,7 +142,6 @@ function ChatScreen() {
             {/* footer */}
             {
                 isBottomLoading ? <ActivityIndicator/> :
-                
                 showBottom ?
                     <View style={{ flexDirection: "row", alignItems: "center" }} >
                         <TextInput
@@ -238,9 +248,24 @@ function ChatScreen() {
                         <View style={{flexDirection:"row", alignSelf:"center"}}>
                             <CustomButton text="Block" onTap={()=>{}}/>
                             <View style={{marginHorizontal: 8}} >
-                                <CustomButton text="Delete" onTap={()=>{}}/>
+                                <CustomButton 
+                                    text="Delete"
+                                    onTap={()=>{
+                                        navigation.goBack()
+                                    }}
+                                />
                             </View>
-                            <CustomButton text="Accept" onTap={()=>{}}/>
+                            <CustomButton text="Accept" onTap={()=>{
+                                    firebase.firestore().collection('chatRooms')
+                                    .doc(route.params.chatRoomId!).set({
+                                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                        createdBy: route.params.chatId,
+                                        isAccepted: true,
+                                        isBlocked: false
+                                    }).then((_)=>{
+                                        setShowBottom(true)
+                                    })
+                            }}/>
                         </View>
                     </View>
             }

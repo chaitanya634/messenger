@@ -31,10 +31,9 @@ function ChatScreen() {
 
     const [roomId, setRoomId] = useState(route.params.chatRoomId)
 
-    const [showBottom, setShowBottom] = useState(true)
     const [isBottomLoading, setIsBottomLoading] = useState(true)
-
     const [isChatBlocked, setIsChatBlocked] = useState(false)
+    const [showChatAck, setShowChatAck] = useState(false)
 
     useEffect(() => {
         firebase.firestore()
@@ -57,18 +56,18 @@ function ChatScreen() {
                         .doc(roomId).get().then((res) => {
                             let roomData = res.data()
                             //receiver acc & not accepted & not blocked
+                            //show chat ack
                             if (roomData?.createdBy != route.params.myId
                                 && !roomData?.isAccepted
                                 && !roomData?.isBlocked
                             ) {
                                 setIsBottomLoading(false)
-                                setShowBottom(false)
+                                setShowChatAck(true)
                             }
                             //receiver acc & accepted
                             else if (roomData?.createdBy != route.params.myId
                                 && roomData?.isAccepted) {
                                 setIsBottomLoading(false)
-                                setShowBottom(true)
                             }
                             //sender acc & blocked
                             else if (roomData?.createdBy == route.params.myId && roomData?.isBlocked) {
@@ -228,11 +227,27 @@ function ChatScreen() {
                     },
                 }}
                 chatDialog={{
-                    showDialog:false,
+                    showDialog: showChatAck,
                     dialogMsg: `Accept message request from ${route.params.chatFirstName} ${route.params.chatLastName} (${route.params.chatUserName}) ?`,
-                    onBlockBtnPressed(event) {},
-                    onDeleteBtnPressed(event) {},
-                    onAcceptBtnPressed(event) {},
+                    onBlockBtnPressed(event) {
+                        firebase.firestore().collection('chatRooms')
+                            .doc(route.params?.chatRoomId ?? "").set({
+                                isBlocked: true,
+                                isAccepted: false,
+                                createdBy: route.params.chatId,
+                            })
+                    },
+                    onDeleteBtnPressed(event) { },
+                    onAcceptBtnPressed(event) {
+                        firebase.firestore().collection('chatRooms')
+                            .doc(route.params?.chatRoomId ?? "").set({
+                                isBlocked: false,
+                                isAccepted: true,
+                                createdBy: route.params.chatId,
+                            }).then((_)=>{
+                                setShowChatAck(false)
+                            })
+                    },
                 }}
             />
             {

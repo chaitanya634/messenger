@@ -76,6 +76,7 @@ function ChatScreen() {
                             }
                             else {
                                 //sender account
+                                //
                                 setIsBottomLoading(false)
                             }
                         })

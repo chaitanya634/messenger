@@ -1,6 +1,6 @@
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import { View, Text, SafeAreaView, Button, ActivityIndicator, TouchableOpacity, FlatList, TextInput, Alert } from "react-native";
+import { View, Text, SafeAreaView, Button, ActivityIndicator, TouchableOpacity, FlatList, TextInput, Alert, KeyboardAvoidingView, KeyboardAvoidingViewComponent, ScrollView, Platform } from "react-native";
 import { ScreenParams, StackParams } from "../../../App";
 import CustomHeader from "../components/header";
 import CustomButton from "../components/CustomButton";
@@ -8,6 +8,7 @@ import ComponentStyles from "../styles/MyStylesheet";
 import firestore, { FirebaseFirestoreTypes, firebase } from '@react-native-firebase/firestore';
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import ChatFooter from "../components/ChatFooter";
+import { GiftedChat } from "react-native-gifted-chat";
 
 type MsgItemType = {
     id: string,
@@ -16,8 +17,6 @@ type MsgItemType = {
     senderFirstName: string,
     senderId: string
 }
-
-
 
 function ChatScreen() {
     const navigation = useNavigation()
@@ -103,6 +102,10 @@ function ChatScreen() {
     }, [roomId])
 
     return (
+        <KeyboardAvoidingView
+            style={{flex:1}}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
         <SafeAreaView style={{ flex: 1, margin: 12 }}>
             <CustomHeader
                 title={route.params.chatFirstName + " " + route.params.chatLastName}
@@ -125,6 +128,7 @@ function ChatScreen() {
                         isNewChat: route.params.isNewChat,
                 }}
             />
+            {/* body */}
             <View style={{
                 flex: 1,
                 marginVertical: 12,
@@ -174,9 +178,7 @@ function ChatScreen() {
                             }}
                         />
                 }
-
             </View>
-
             {/* footer */}
             <ChatFooter
                 isLoading={isBottomLoading}
@@ -314,9 +316,11 @@ function ChatScreen() {
                             })
                     },
                 }}
-            />
-        </SafeAreaView>
+            />            
+        </SafeAreaView> 
+        </KeyboardAvoidingView> 
     );
+
 }
 
 export default ChatScreen

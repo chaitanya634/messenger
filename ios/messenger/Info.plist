@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>messenger</string>
+	<string>Intoactive Messenger</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -60,6 +60,24 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>ble always</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>ble peripherial</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>use calender</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>location using</string>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>using media lib</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>using mic</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>photo lib add</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>photo lib desc</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>speech recg</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 </dict>

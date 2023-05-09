@@ -54,8 +54,8 @@ function ChatScreen() {
                 })
                 if (roomId != null) {
                     firebase.firestore().collection('chatRooms')
-                        .doc(roomId).get().then((res) => {
-                            let roomData = res.data()
+                        .doc(roomId).onSnapshot(snapshot => {
+                            let roomData = snapshot.data()
                             //receiver acc & not accepted & not blocked
                             //show chat ack
                             if (roomData?.createdBy != route.params.myId
@@ -81,6 +81,13 @@ function ChatScreen() {
                                 setIsBottomLoading(false)
                                 setIsChatBlocked(true)
                             }
+                            //====
+                            //sender acc & unblocked
+                            else if (roomData?.createdBy == route.params.myId && roomData?.isBlocked == false && roomData?.isAccepted == true) {
+                                setIsBottomLoading(false)
+                                setIsChatBlocked(false)
+                            }
+                            //====
                             else {
                                 //sender account
                                 //

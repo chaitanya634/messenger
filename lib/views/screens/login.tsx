@@ -32,7 +32,7 @@ function LoginScreen() {
           else {
             setIsLoginBtnDisabled(true)
             firebase.firestore().collection('users')
-              .where('userName', '==', username).get().then((res) => {
+              .where('userName', '==', username.trim()).get().then((res) => {
                 if (res.empty) {
                   Alert.alert("Cannot Login", "Username is not registerd")
                 } else {

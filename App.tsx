@@ -5,15 +5,16 @@ import LoginScreen from './lib/views/screens/login';
 import RegisterScreen from './lib/views/screens/register';
 import ChatScreen from './lib/views/screens/chat';
 import HomeScreen from './lib/views/screens/home';
-import { firebase } from '@react-native-firebase/firestore';
 import NewMsg from './lib/views/screens/NewMsg';
+import ProfileScreen from './lib/views/screens/profile';
 
 export type StackParams = {
   Login: any,
   Register: any,
   Home: any,
-  Chat: any
-  NewMsg: any
+  Chat: any,
+  NewMsg: any,
+  Profile: any
 }
 
 export type ScreenParams = {
@@ -40,6 +41,19 @@ export type ScreenParams = {
     myFirstName: string,
     myLastName: string,
     myUserName: string,
+  },
+  Profile: {
+    showMyProfile: boolean
+    chatRoomId: string | null
+    myId: string,
+    myFirstName: string,
+    myLastName: string,
+    myUserName: string,
+    chatId: string | null,
+    chatFirstName: string | null,
+    chatLastName: string | null,
+    chatUserName: string | null,
+    isNewChat: boolean
   }
 }
 
@@ -52,6 +66,7 @@ function App(): JSX.Element {
         <Stack.Screen name="Login" component={LoginScreen} options={{ title: "Messenger App" }} />
         <Stack.Screen name="Register" component={RegisterScreen} options={{ title: "Register" }} />
         <Stack.Screen name="NewMsg" component={NewMsg} options={{ title: "Start Conversation" }} />
+        <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: "Profile" }} />
         <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Chat" component={ChatScreen} options={{ headerShown: false }} />
       </Stack.Navigator>

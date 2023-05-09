@@ -104,6 +104,19 @@ function ChatScreen() {
                     text: "Back",
                     onPress: () => navigation.goBack()
                 }}
+                profile={{
+                        showMyProfile: false,
+                        chatRoomId: route.params.chatRoomId,
+                        myId: route.params.myId,
+                        myFirstName: route.params.myFirstName,
+                        myLastName: route.params.myLastName,
+                        myUserName: route.params.myUserName,
+                        chatId: route.params.chatId,
+                        chatFirstName: route.params.chatFirstName,
+                        chatLastName: route.params.chatLastName,
+                        chatUserName: route.params.chatUserName,
+                        isNewChat: route.params.isNewChat,
+                }}
             />
             <View style={{
                 flex: 1,

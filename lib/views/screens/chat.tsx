@@ -263,6 +263,7 @@ function ChatScreen() {
                             })
                     },
                     onDeleteBtnPressed(event) {
+                        setIsBottomLoading(true)
                         const db = firebase.firestore()
                         //del room
                         db.collection('chatRooms').doc(roomId ?? '').delete().then((_)=>{
@@ -274,6 +275,7 @@ function ChatScreen() {
                                     db.collection('users').doc(route.params.chatId)
                                     .collection('myChatRooms').where('chatRoomId','==',roomId ?? '').get().then((val)=>{
                                         db.collection('users').doc(route.params.chatId).collection('myChatRooms').doc(val.docs[0].id).delete().then((_)=>{
+                                            setIsBottomLoading(false) 
                                             navigation.goBack()
                                         })
                                     })

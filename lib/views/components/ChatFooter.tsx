@@ -56,7 +56,7 @@ const ChatFooter = (props: Props) => {
     }
     if (props.chatDialog.showDialog) {
         return (
-            <View style={{ borderWidth: 1, padding: 6 }}>
+            <View style={{ borderWidth: 1, padding: 6, borderRadius: 12 }}>
                 <Text
                     style={{
                         alignSelf: "center",

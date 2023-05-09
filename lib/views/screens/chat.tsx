@@ -54,8 +54,8 @@ function ChatScreen() {
                 })
                 if (roomId != null) {
                     firebase.firestore().collection('chatRooms')
-                        .doc(roomId).get().then((res) => {
-                            let roomData = res.data()
+                        .doc(roomId).onSnapshot(snapshot => {
+                            let roomData = snapshot.data()
                             //receiver acc & not accepted & not blocked
                             //show chat ack
                             if (roomData?.createdBy != route.params.myId
@@ -81,6 +81,13 @@ function ChatScreen() {
                                 setIsBottomLoading(false)
                                 setIsChatBlocked(true)
                             }
+                            //====
+                            //sender acc & unblocked
+                            else if (roomData?.createdBy == route.params.myId && roomData?.isBlocked == false && roomData?.isAccepted == true) {
+                                setIsBottomLoading(false)
+                                setIsChatBlocked(false)
+                            }
+                            //====
                             else {
                                 //sender account
                                 //
@@ -103,6 +110,19 @@ function ChatScreen() {
                 action={{
                     text: "Back",
                     onPress: () => navigation.goBack()
+                }}
+                profile={{
+                        showMyProfile: false,
+                        chatRoomId: route.params.chatRoomId,
+                        myId: route.params.myId,
+                        myFirstName: route.params.myFirstName,
+                        myLastName: route.params.myLastName,
+                        myUserName: route.params.myUserName,
+                        chatId: route.params.chatId,
+                        chatFirstName: route.params.chatFirstName,
+                        chatLastName: route.params.chatLastName,
+                        chatUserName: route.params.chatUserName,
+                        isNewChat: route.params.isNewChat,
                 }}
             />
             <View style={{
@@ -165,15 +185,15 @@ function ChatScreen() {
                 showUnblockBtn={showUnblockBtn}
                 onUnblockBtnPressed={() => {
                     firebase.firestore().collection('chatRooms')
-                    .doc(route.params?.chatRoomId ?? "").set({
-                        createdBy: route.params.chatId,
-                        isAccepted: true,
-                        isBlocked: false
-                    }).then((_)=>{
-                        setIsChatBlocked(false)
-                        setShowChatAck(false)
-                        setShowUnblockBtn(false)
-                    })
+                        .doc(route.params?.chatRoomId ?? "").set({
+                            createdBy: route.params.chatId,
+                            isAccepted: true,
+                            isBlocked: false
+                        }).then((_) => {
+                            setIsChatBlocked(false)
+                            setShowChatAck(false)
+                            setShowUnblockBtn(false)
+                        })
                 }}
                 footer={{
                     defaultMsg: message,
@@ -233,6 +253,7 @@ function ChatScreen() {
                                         })
                                 })
                             } else {
+
                                 firebase.firestore().collection("chatRooms").doc(roomId)
                                     .collection('messages').add({
                                         content: message,
@@ -256,164 +277,44 @@ function ChatScreen() {
                                 isBlocked: true,
                                 isAccepted: false,
                                 createdBy: route.params.chatId,
-                            }).then((_)=>{
+                            }).then((_) => {
                                 setShowChatAck(false)
                                 setShowUnblockBtn(true)
                             })
                     },
-                    onDeleteBtnPressed(event) { },
+                    onDeleteBtnPressed(event) {
+                        setIsBottomLoading(true)
+                        const db = firebase.firestore()
+                        //del room
+                        db.collection('chatRooms').doc(roomId ?? '').delete().then((_)=>{
+                            //del from my acc
+                            db.collection('users').doc(route.params.myId)
+                            .collection('myChatRooms').where('chatRoomId','==',roomId ?? '').get().then((val)=>{
+                                db.collection('users').doc(route.params.myId).collection('myChatRooms').doc(val.docs[0].id).delete().then((_)=>{
+                                    //del from recv acc
+                                    db.collection('users').doc(route.params.chatId)
+                                    .collection('myChatRooms').where('chatRoomId','==',roomId ?? '').get().then((val)=>{
+                                        db.collection('users').doc(route.params.chatId).collection('myChatRooms').doc(val.docs[0].id).delete().then((_)=>{
+                                            setIsBottomLoading(false) 
+                                            navigation.goBack()
+                                        })
+                                    })
+                                })
+                            })
+                        })
+                    },
                     onAcceptBtnPressed(event) {
                         firebase.firestore().collection('chatRooms')
                             .doc(route.params?.chatRoomId ?? "").set({
                                 isBlocked: false,
                                 isAccepted: true,
                                 createdBy: route.params.chatId,
-                            }).then((_)=>{
+                            }).then((_) => {
                                 setShowChatAck(false)
                             })
                     },
                 }}
             />
-            {
-                /*
-                isBottomLoading 
-                ? 
-                <ActivityIndicator/> 
-                :
-                showBottom
-                ?
-                    <View style={{ flexDirection: "row", alignItems: "center" }} >
-                        <TextInput
-                            style={{
-                                marginRight: 12,
-                                fontSize: 18,
-                                borderWidth: 2,
-                                borderRadius: 12,
-                                paddingHorizontal: 13,
-                                borderColor: "#525252",
-                                color: "#525252",
-                                flex: 1,
-                                height: 40
-                            }}
-                            placeholder="Please enter message"
-                            placeholderTextColor="#A7A7A7"
-                            onChangeText={(input) => { setMessage(input) }}
-                            defaultValue={message}
-                        />
-                        <CustomButton
-                            text="Send"
-                            onTap={() => {
-                                if (message.length == 0) {
-                                    Alert.alert("Cannot Send", "Please enter message")
-                                } else {
-                                    setIsSendBtnDisabled(true)
-                                    if (roomId == null) {
-                                        //create new room
-                                        console.log('create new room')
-                                        firebase.firestore().collection('chatRooms').add({
-                                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                                            createdBy: route.params.myId,
-                                            isAccepted: false,
-                                            isBlocked: false
-                                        }).then((res) => {
-                                            //add room details to my account
-                                            firebase.firestore().collection('users').doc(route.params.myId)
-                                                .collection('myChatRooms').add({
-                                                    chatRoomId: res.id,
-                                                    myId: route.params.myId,
-                                                    myFirstName: route.params.myFirstName,
-                                                    myLastName: route.params.myLastName,
-                                                    myUserName: route.params.myUserName,
-                                                    chatId: route.params.chatId,
-                                                    chatFirstName: route.params.chatFirstName,
-                                                    chatLastName: route.params.chatLastName,
-                                                    chatUserName: route.params.chatUserName
-                                                }).then((_) => {
-                                                    //add room details to chat account
-                                                    firebase.firestore().collection('users').doc(route.params.chatId)
-                                                        .collection('myChatRooms').add({
-                                                            chatRoomId: res.id,
-                                                            myId: route.params.chatId,
-                                                            myFirstName: route.params.chatFirstName,
-                                                            myLastName: route.params.chatLastName,
-                                                            myUserName: route.params.chatUserName,
-                                                            chatId: route.params.myId,
-                                                            chatFirstName: route.params.myFirstName,
-                                                            chatLastName: route.params.myLastName,
-                                                            chatUserName: route.params.myUserName
-                                                        })
-                                                }).then((_) => {
-                                                    //add message
-                                                    res.collection('messages').add({
-                                                        content: message,
-                                                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                                                        senderFirstName: route.params.myFirstName,
-                                                        senderId: route.params.myId
-                                                    }).then((_) => {
-                                                        setIsSendBtnDisabled(false)
-                                                        setMessage("")
-                                                        setRoomId(res.id)
-                                                    })
-                                                })
-                                        })
-                                    } else {
-                                        firebase.firestore().collection("chatRooms").doc(roomId)
-                                            .collection('messages').add({
-                                                content: message,
-                                                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                                                senderFirstName: route.params.myFirstName,
-                                                senderId: route.params.myId
-                                            }).then((v) => {
-                                                setIsSendBtnDisabled(false)
-                                                setMessage("")
-                                            })
-                                    }
-                                }
-                            }}
-                        />
-                    </View> 
-                : 
-                isChatBlocked 
-                ?
-                            <Text>BLOCKED</Text>
-                :
-                    <View style={{borderWidth: 1, padding: 6}}>
-                        <Text 
-                            style={{
-                                alignSelf:"center", 
-                                textAlign:"center", 
-                                fontWeight:"bold", 
-                                color:'black',
-                                fontSize: 18,
-                                paddingBottom: 12
-                            }}>
-                            Accept message request from {route.params.chatFirstName} {route.params.chatLastName} ({route.params.chatUserName}) ?
-                        </Text>
-                        <View style={{flexDirection:"row", alignSelf:"center"}}>
-                            <CustomButton text="Block" onTap={()=>{}}/>
-                            <View style={{marginHorizontal: 8}} >
-                                <CustomButton 
-                                    text="Delete"
-                                    onTap={()=>{
-                                        navigation.goBack()
-                                    }}
-                                />
-                            </View>
-                            <CustomButton text="Accept" onTap={()=>{
-                                    firebase.firestore().collection('chatRooms')
-                                    .doc(route.params.chatRoomId!).set({
-                                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                                        createdBy: route.params.chatId,
-                                        isAccepted: true,
-                                        isBlocked: false
-                                    }).then((_)=>{
-                                        setShowBottom(true)
-                                    })
-                            }}/>
-                        </View>
-                    </View>
-                    */
-            }
         </SafeAreaView>
     );
 }

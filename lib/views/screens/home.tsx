@@ -47,13 +47,23 @@ function HomeScreen() {
                     title={route.params.myFirstName+" "+route.params.myLastName}
                     subtitle={route.params.myUserName}
                     action={{text:"Logout",onPress: () => navigation.goBack()}}
+                    profile={{
+                        showMyProfile: true,
+                        chatRoomId: null,
+                        myId: route.params.myId,
+                        myFirstName: route.params.myFirstName,
+                        myLastName: route.params.myLastName,
+                        myUserName: route.params.myUserName,
+                        chatId: null,
+                        chatFirstName: null,
+                        chatLastName: null,
+                        chatUserName: null,
+                        isNewChat: false,
+                    }}
                 />
 
                 <View style={{flexDirection:'row', alignSelf:'center', marginTop: 8, marginBottom:4 }} >
-                    <OutlinedButton 
-                        text='Requests'
-                        onTap={()=>{}}
-                    />
+                  
                     <OutlinedButton 
                         text='New Message'
                         onTap={()=>{

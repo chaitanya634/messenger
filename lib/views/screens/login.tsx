@@ -38,15 +38,18 @@ function LoginScreen() {
                 } else {
                   const userDoc = res.docs[0]
                   const userData = userDoc.data()
-                  navigation.navigate('Home',{
-                    myId: userDoc.id,
-                    myFirstName: userData.firstName,
-                    myLastName: userData.lastName,
-                    myUserName: userData.userName
+                  firebase.firestore().collection('activeUsers').add({userId: userDoc.id}).then((doc)=>{
+                    navigation.navigate('Home',{
+                      activeUsersDocId: doc.id,
+                      myId: userDoc.id,
+                      myFirstName: userData.firstName,
+                      myLastName: userData.lastName,
+                      myUserName: userData.userName
+                    })
+                    setUsername("")
+                    setIsLoginBtnDisabled(false)
                   })
-                  setUsername("")
                 }
-                setIsLoginBtnDisabled(false)
               })
           }
         }}

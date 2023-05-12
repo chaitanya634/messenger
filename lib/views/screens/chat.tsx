@@ -41,6 +41,9 @@ function ChatScreen() {
     const [showChatAck, setShowChatAck] = useState(false)
     const [showUnblockBtn, setShowUnblockBtn] = useState(false)
 
+    //online/offline
+    const [isReceiverOnline, setIsReceiverOnline] = useState(false)
+
     useEffect(() => {
         firebase.firestore()
             .collection('chatRooms').doc(roomId ?? "")
@@ -67,44 +70,60 @@ function ChatScreen() {
                                 && !roomData?.isAccepted
                                 && !roomData?.isBlocked
                             ) {
+                                setIsLoading(false);//
                                 setIsBottomLoading(false)
                                 setShowChatAck(true)
                             }
                             //receiver acc & accepted
                             else if (roomData?.createdBy != route.params.myId
                                 && roomData?.isAccepted) {
+                                    setIsLoading(false);//
                                 setIsBottomLoading(false)
                             }
                             //receiver acc & blocked
                             else if (roomData?.createdBy != route.params.myId
                                 && roomData?.isBlocked) {
+                                    setIsLoading(false);//
                                 setIsBottomLoading(false)
                                 setShowUnblockBtn(true)
                             }
                             //sender acc & blocked
                             else if (roomData?.createdBy == route.params.myId && roomData?.isBlocked) {
+                                setIsLoading(false);//
                                 setIsBottomLoading(false)
                                 setIsChatBlocked(true)
                             }
                             //====
                             //sender acc & unblocked
                             else if (roomData?.createdBy == route.params.myId && roomData?.isBlocked == false && roomData?.isAccepted == true) {
+                                setIsLoading(false);//
                                 setIsBottomLoading(false)
                                 setIsChatBlocked(false)
                             }
                             //====
                             else {
                                 //sender account
-                                //
+                                setIsLoading(false);//
                                 setIsBottomLoading(false)
                             }
                         })
                 } else {
+                    setIsLoading(false);//
                     setIsBottomLoading(false)
                 }
-                setIsLoading(false);
+                // setIsLoading(false);
                 setMessages(messages);
             })
+        
+        //online/offline
+        firebase.firestore().collection('activeUsers')
+        .where('userId','==',route.params.chatId)
+        .onSnapshot({
+            next(snapshot) {
+                setIsReceiverOnline(!snapshot.empty)
+            },
+        })
+
     }, [roomId])
 
     return (
@@ -118,6 +137,7 @@ function ChatScreen() {
                 subtitle={route.params.chatUserName}
                 action={{
                     text: "Back",
+                    isDisabled: false,
                     onPress: () => navigation.goBack()
                 }}
                 profile={{
@@ -134,6 +154,11 @@ function ChatScreen() {
                         isNewChat: route.params.isNewChat,
                 }}
             />
+            {/* status */}
+            <Text style={{
+                paddingVertical: 4,
+                color: 'black'
+            }} >{isReceiverOnline ? "Online" : "Offline"}</Text>
             {/* body */}
             <View style={{
                 flex: 1,
@@ -142,7 +167,7 @@ function ChatScreen() {
             }}>
                 {
                     isLoading ?
-                        <ActivityIndicator /> :
+                        <ActivityIndicator size={"large"} /> :
                         <FlatList
                             inverted={true}
                             data={messages}

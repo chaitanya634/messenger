@@ -23,6 +23,7 @@ export type ScreenParams = {
     myFirstName: string,
     myLastName: string,
     myUserName: string,
+    activeUsersDocId: string
   },
   Chat: {
     chatRoomId: string | null

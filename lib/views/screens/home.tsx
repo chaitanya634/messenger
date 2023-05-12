@@ -27,6 +27,8 @@ function HomeScreen() {
     const [isLoading, setIsLoading] = useState(true)
     const [chats, setChats] = useState([])
 
+    const [isLogoutBtnDisabled, setIsLogoutBtnDisabled] = useState(false)
+
     useEffect(() => {
         firebase.firestore()
             .collection('users').doc(route.params.myId)
@@ -46,7 +48,19 @@ function HomeScreen() {
                 <CustomHeader 
                     title={route.params.myFirstName+" "+route.params.myLastName}
                     subtitle={route.params.myUserName}
-                    action={{text:"Logout",onPress: () => navigation.goBack()}}
+                    action={{
+                        text:"Logout",
+                        isDisabled: isLogoutBtnDisabled,
+                        onPress: () => {
+                            setIsLogoutBtnDisabled(true)
+                            firebase.firestore().collection('activeUsers')
+                            .doc(route.params.activeUsersDocId).delete()
+                            .then((_) => {
+                                setIsLogoutBtnDisabled(false)
+                                navigation.goBack()
+                            })
+                        }
+                    }}
                     profile={{
                         showMyProfile: true,
                         chatRoomId: null,

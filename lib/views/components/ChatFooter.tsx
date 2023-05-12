@@ -23,7 +23,7 @@ type Props = {
 
 const ChatFooter = (props: Props) => {
     if (props.isLoading) {
-        return <ActivityIndicator size={"large"} />
+        return null //<ActivityIndicator />
     }
     if (props.isBlocked) {
         return <Text style={{

@@ -127,8 +127,9 @@ function ChatScreen() {
     }, [roomId])
 
     return (
-        <KeyboardAvoidingView
-            style={{flex:1}}
+        <KeyboardAvoidingView  
+            style={{flex: 1}} 
+            behavior="padding" 
             keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 38}
         >
         <SafeAreaView style={{ flex: 1, margin: 12 }}>
@@ -360,7 +361,7 @@ function ChatScreen() {
                 }}
             />            
         </SafeAreaView> 
-        </KeyboardAvoidingView> 
+        </KeyboardAvoidingView>
     );
 
 }

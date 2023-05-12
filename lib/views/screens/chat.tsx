@@ -289,9 +289,9 @@ function ChatScreen() {
                                                 senderFirstName: route.params.myFirstName,
                                                 senderId: route.params.myId
                                             }).then((_) => {
-                                                setIsSendBtnDisabled(false)
                                                 setMessage("")
                                                 setRoomId(res.id)
+                                                setIsSendBtnDisabled(false)
                                             })
                                         })
                                 })
@@ -304,12 +304,13 @@ function ChatScreen() {
                                         senderFirstName: route.params.myFirstName,
                                         senderId: route.params.myId
                                     }).then((v) => {
-                                        setIsSendBtnDisabled(false)
                                         setMessage("")
+                                        setIsSendBtnDisabled(false)
                                     })
                             }
                         }
                     },
+                    isSendBtnDisabled
                 }}
                 chatDialog={{
                     showDialog: showChatAck,

@@ -11,6 +11,7 @@ type Props = {
         defaultMsg: string
         onMsgTyped: ((text: string) => void)
         onSendBtnPressed: (event: GestureResponderEvent) => void
+        isSendBtnDisabled: boolean
     },
     chatDialog: {
         showDialog: boolean,
@@ -103,6 +104,7 @@ const ChatFooter = (props: Props) => {
             <CustomButton
                 text="Send"
                 onTap={props.footer.onSendBtnPressed}
+                isDisabled = {props.footer.isSendBtnDisabled}
             />
         </View>
     )

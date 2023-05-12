@@ -35,6 +35,7 @@ function LoginScreen() {
               .where('userName', '==', username.trim()).get().then((res) => {
                 if (res.empty) {
                   Alert.alert("Cannot Login", "Username is not registerd")
+                  setIsLoginBtnDisabled(false)
                 } else {
                   const userDoc = res.docs[0]
                   const userData = userDoc.data()

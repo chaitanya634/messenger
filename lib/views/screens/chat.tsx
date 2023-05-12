@@ -18,6 +18,12 @@ type MsgItemType = {
     senderId: string
 }
 
+function convert24To12Hrs(hours: number, minutes: number) {
+    const amOrPm = hours >= 12 ? 'PM' : 'AM'
+    const hours12 = (hours % 12) || 12
+    return `${hours12}:${minutes} ${amOrPm}`
+}
+
 function ChatScreen() {
     const navigation = useNavigation()
     const route = useRoute<RouteProp<ScreenParams, 'Chat'>>()
@@ -148,14 +154,21 @@ function ChatScreen() {
                                             alignSelf: "flex-end",
                                             backgroundColor: "#67D4FF",
                                             margin: 4,
-                                            paddingHorizontal: 8,
+                                            paddingHorizontal: 10,
                                             paddingVertical: 6,
                                             borderTopLeftRadius: 8,
                                             borderBottomLeftRadius: 8,
                                             borderBottomRightRadius: 8
                                         }}>
-                                            <Text style={{ fontSize: 16, color: "#000000" }}>
+                                            <Text style={{ fontSize: 16, color: "#000000", paddingBottom: 6 }}>
                                                 {item.content}
+                                            </Text>
+                                            <Text style={{ fontSize: 12, color: "#000000", textAlign:"right" }}>
+                                                {
+                                                    item.createdAt == null 
+                                                    ? convert24To12Hrs(new Date().getHours(), new Date().getMinutes())
+                                                    : convert24To12Hrs(item.createdAt.toDate().getHours(), item.createdAt.toDate().getMinutes())
+                                                }
                                             </Text>
                                         </View>
                                     )
@@ -170,9 +183,12 @@ function ChatScreen() {
                                         borderBottomLeftRadius: 8,
                                         borderBottomRightRadius: 8
                                     }}>
-                                        <Text style={{ fontSize: 16, color: '#000000' }} >
-                                            {item.content}
-                                        </Text>
+                                        <Text style={{ fontSize: 16, color: "#000000", paddingBottom: 6 }}>
+                                                {item.content}
+                                            </Text>
+                                            <Text style={{ fontSize: 12, color: "#000000", textAlign:"right" }}>
+                                                {convert24To12Hrs(item.createdAt.toDate().getHours(), item.createdAt.toDate().getMinutes())}
+                                            </Text>
                                     </View>
                                 )
                             }}

@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
-import { View, Text, SafeAreaView, ActivityIndicator, FlatList, TouchableOpacity, Button } from "react-native"
+import { 
+    View, Text, SafeAreaView, ActivityIndicator, 
+    FlatList, TouchableOpacity, Button, AppState
+} from "react-native"
 import { FirebaseFirestoreTypes, firebase } from '@react-native-firebase/firestore';
 import { ScreenParams, StackParams } from '../../../App'
 import CustomButton from '../components/CustomButton';
@@ -30,6 +33,22 @@ function HomeScreen() {
     const [isLogoutBtnDisabled, setIsLogoutBtnDisabled] = useState(false)
 
     useEffect(() => {
+        AppState.addEventListener('change', appState => {
+            if(appState === 'active') {
+                //online
+                firebase.firestore().collection('activeUsers').add({userId: route.params.myId})
+            } else {
+                //offline
+                firebase.firestore().collection('activeUsers')
+                .where('userId','==',route.params.myId).get()
+                .then((res)=>{
+                    res.docs.forEach((doc)=>{
+                        firebase.firestore().collection('activeUsers').doc(doc.id).delete()
+                    })
+                })
+            }
+        })
+
         firebase.firestore()
             .collection('users').doc(route.params.myId)
             .collection('myChatRooms').onSnapshot(querySnapshot => {
@@ -40,6 +59,15 @@ function HomeScreen() {
                 setChats(chats);
                 setIsLoading(false);
             });
+        return () => {
+            firebase.firestore().collection('activeUsers')
+                .where('userId','==',route.params.myId).get()
+                .then((res)=>{
+                    res.docs.forEach((doc)=>{
+                        firebase.firestore().collection('activeUsers').doc(doc.id).delete()
+                    })
+                })
+        }
     }, []);
 
     return (
@@ -53,9 +81,20 @@ function HomeScreen() {
                         isDisabled: isLogoutBtnDisabled,
                         onPress: () => {
                             setIsLogoutBtnDisabled(true)
+                            // firebase.firestore().collection('activeUsers')
+                            // .doc(route.params.activeUsersDocId).delete()
+                            // .then((_) => {
+                            //     setIsLogoutBtnDisabled(false)
+                            //     navigation.goBack()
+                            // })
                             firebase.firestore().collection('activeUsers')
-                            .doc(route.params.activeUsersDocId).delete()
-                            .then((_) => {
+                            .where('userId','==',route.params.myId).get()
+                            .then((res) => {
+                                res.docs.forEach((doc)=>{
+                                    firebase.firestore().collection('activeUsers')
+                                    .doc(doc.id).delete()
+                                })
+                            }).then((_)=>{
                                 setIsLogoutBtnDisabled(false)
                                 navigation.goBack()
                             })

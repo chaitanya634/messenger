@@ -18,6 +18,12 @@ type MsgItemType = {
     senderId: string
 }
 
+function convert24To12Hrs(hours: number, minutes: number) {
+    const amOrPm = hours >= 12 ? 'PM' : 'AM'
+    const hours12 = (hours % 12) || 12
+    return `${hours12}:${minutes} ${amOrPm}`
+}
+
 function ChatScreen() {
     const navigation = useNavigation()
     const route = useRoute<RouteProp<ScreenParams, 'Chat'>>()
@@ -34,6 +40,9 @@ function ChatScreen() {
     const [isChatBlocked, setIsChatBlocked] = useState(false)
     const [showChatAck, setShowChatAck] = useState(false)
     const [showUnblockBtn, setShowUnblockBtn] = useState(false)
+
+    //online/offline
+    const [isReceiverOnline, setIsReceiverOnline] = useState(false)
 
     useEffect(() => {
         firebase.firestore()
@@ -61,50 +70,67 @@ function ChatScreen() {
                                 && !roomData?.isAccepted
                                 && !roomData?.isBlocked
                             ) {
+                                setIsLoading(false);//
                                 setIsBottomLoading(false)
                                 setShowChatAck(true)
                             }
                             //receiver acc & accepted
                             else if (roomData?.createdBy != route.params.myId
                                 && roomData?.isAccepted) {
+                                    setIsLoading(false);//
                                 setIsBottomLoading(false)
                             }
                             //receiver acc & blocked
                             else if (roomData?.createdBy != route.params.myId
                                 && roomData?.isBlocked) {
+                                    setIsLoading(false);//
                                 setIsBottomLoading(false)
                                 setShowUnblockBtn(true)
                             }
                             //sender acc & blocked
                             else if (roomData?.createdBy == route.params.myId && roomData?.isBlocked) {
+                                setIsLoading(false);//
                                 setIsBottomLoading(false)
                                 setIsChatBlocked(true)
                             }
                             //====
                             //sender acc & unblocked
                             else if (roomData?.createdBy == route.params.myId && roomData?.isBlocked == false && roomData?.isAccepted == true) {
+                                setIsLoading(false);//
                                 setIsBottomLoading(false)
                                 setIsChatBlocked(false)
                             }
                             //====
                             else {
                                 //sender account
-                                //
+                                setIsLoading(false);//
                                 setIsBottomLoading(false)
                             }
                         })
                 } else {
+                    setIsLoading(false);//
                     setIsBottomLoading(false)
                 }
-                setIsLoading(false);
+                // setIsLoading(false);
                 setMessages(messages);
             })
+        
+        //online/offline
+        firebase.firestore().collection('activeUsers')
+        .where('userId','==',route.params.chatId)
+        .onSnapshot({
+            next(snapshot) {
+                setIsReceiverOnline(!snapshot.empty)
+            },
+        })
+
     }, [roomId])
 
     return (
-        <KeyboardAvoidingView
-            style={{flex:1}}
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
+        <KeyboardAvoidingView  
+            style={{flex: 1}} 
+            behavior =  {Platform.OS === 'ios' ? "padding" : undefined}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 38}
         >
         <SafeAreaView style={{ flex: 1, margin: 12 }}>
             <CustomHeader
@@ -112,6 +138,7 @@ function ChatScreen() {
                 subtitle={route.params.chatUserName}
                 action={{
                     text: "Back",
+                    isDisabled: false,
                     onPress: () => navigation.goBack()
                 }}
                 profile={{
@@ -128,6 +155,11 @@ function ChatScreen() {
                         isNewChat: route.params.isNewChat,
                 }}
             />
+            {/* status */}
+            <Text style={{
+                paddingVertical: 4,
+                color: 'black'
+            }} >{isReceiverOnline ? "Online" : "Offline"}</Text>
             {/* body */}
             <View style={{
                 flex: 1,
@@ -136,7 +168,7 @@ function ChatScreen() {
             }}>
                 {
                     isLoading ?
-                        <ActivityIndicator /> :
+                        <ActivityIndicator size={"large"} /> :
                         <FlatList
                             inverted={true}
                             data={messages}
@@ -148,14 +180,21 @@ function ChatScreen() {
                                             alignSelf: "flex-end",
                                             backgroundColor: "#67D4FF",
                                             margin: 4,
-                                            paddingHorizontal: 8,
+                                            paddingHorizontal: 10,
                                             paddingVertical: 6,
                                             borderTopLeftRadius: 8,
                                             borderBottomLeftRadius: 8,
                                             borderBottomRightRadius: 8
                                         }}>
-                                            <Text style={{ fontSize: 16, color: "#000000" }}>
+                                            <Text style={{ fontSize: 16, color: "#000000", paddingBottom: 6 }}>
                                                 {item.content}
+                                            </Text>
+                                            <Text style={{ fontSize: 12, color: "#000000", textAlign:"right" }}>
+                                                {
+                                                    item.createdAt == null 
+                                                    ? convert24To12Hrs(new Date().getHours(), new Date().getMinutes())
+                                                    : convert24To12Hrs(item.createdAt.toDate().getHours(), item.createdAt.toDate().getMinutes())
+                                                }
                                             </Text>
                                         </View>
                                     )
@@ -170,9 +209,12 @@ function ChatScreen() {
                                         borderBottomLeftRadius: 8,
                                         borderBottomRightRadius: 8
                                     }}>
-                                        <Text style={{ fontSize: 16, color: '#000000' }} >
-                                            {item.content}
-                                        </Text>
+                                        <Text style={{ fontSize: 16, color: "#000000", paddingBottom: 6 }}>
+                                                {item.content}
+                                            </Text>
+                                            <Text style={{ fontSize: 12, color: "#000000", textAlign:"right" }}>
+                                                {convert24To12Hrs(item.createdAt.toDate().getHours(), item.createdAt.toDate().getMinutes())}
+                                            </Text>
                                     </View>
                                 )
                             }}
@@ -248,9 +290,9 @@ function ChatScreen() {
                                                 senderFirstName: route.params.myFirstName,
                                                 senderId: route.params.myId
                                             }).then((_) => {
-                                                setIsSendBtnDisabled(false)
                                                 setMessage("")
                                                 setRoomId(res.id)
+                                                setIsSendBtnDisabled(false)
                                             })
                                         })
                                 })
@@ -263,12 +305,13 @@ function ChatScreen() {
                                         senderFirstName: route.params.myFirstName,
                                         senderId: route.params.myId
                                     }).then((v) => {
-                                        setIsSendBtnDisabled(false)
                                         setMessage("")
+                                        setIsSendBtnDisabled(false)
                                     })
                             }
                         }
                     },
+                    isSendBtnDisabled
                 }}
                 chatDialog={{
                     showDialog: showChatAck,
@@ -318,7 +361,7 @@ function ChatScreen() {
                 }}
             />            
         </SafeAreaView> 
-        </KeyboardAvoidingView> 
+        </KeyboardAvoidingView>
     );
 
 }

@@ -9,7 +9,8 @@ type HeaderParams = {
     subtitle: string,
     action: {
         text: string,
-        onPress: (event: GestureResponderEvent) => void | null
+        onPress: (event: GestureResponderEvent) => void | null,
+        isDisabled: boolean
     },
     profile: {
         chatRoomId: string | null
@@ -54,6 +55,7 @@ const CustomHeader = (params: HeaderParams) => {
             <CustomButton
                 text={params.action.text}
                 onTap={params.action.onPress}
+                isDisabled={params.action.isDisabled}
             />
         </View>
     )
